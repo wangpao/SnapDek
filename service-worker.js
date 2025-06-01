@@ -1,6 +1,6 @@
 const CACHE_NAME = 'dek-player-cache-v1';
 const urlsToCache = [
-  '/index.html',
+  '/SnapDek/index.html',
   '/styles.css',
   '/script.js',
   '/icon-192x192.png',
