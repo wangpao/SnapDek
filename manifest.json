@@ -2,7 +2,7 @@
   "name": "SnapDek",
   "short_name": "SnapDek",
   "description": "A simple and elegant way to memorize.",
-  "start_url": "/index.html",
+  "start_url": "/SnapDek/index.html",
   "display": "standalone",
   "background_color": "#3498db",
   "theme_color": "#3498db",
