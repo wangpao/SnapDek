@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapDek Studio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --highlight-color: #AF54DE;
+            --highlight-bg-color: #F3E6FB;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        #main-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        #input-panel {
+            flex: 1;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #preview-panel {
+            flex: 1;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: calc(100vh - 80px); 
+            overflow-y: auto;
+        }
+        #preview-panel h2 {
+            margin-top: 0;
+        }
+
+        textarea, select, button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #progress {
+            margin-top: 20px;
+        }
+        #status {
+            font-weight: bold;
+        }
+
+        #previewList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        #previewList li {
+            padding: 8px;
+            margin: 6px 0;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            display: flex;
+            align-items: flex-start;
+            border: 1px solid #eee;
+        }
+        .audio-icon-placeholder {
+            display: inline-block;
+            width: 22px; /* Space for icon */
+            height: 20px; /* Match line-height roughly */
+            line-height: 20px;
+            text-align: center;
+            margin-right: 0px;
+            color: #aaa; /* Default color, changes when icon appears */
+            font-size: 16px; /* Icon size */
+        }
+         .audio-icon-placeholder.active {
+            cursor: pointer;
+            color: var(--primary-color); /* Or any color for active icon */
+        }
+
+        .file-number {
+            min-width: 25px; /* original: 25px */
+            margin-right: 8px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 14px;
+            padding-top: 2px; 
+        }
+        .file-content {
+            flex-grow: 1;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        .file-content.playable {
+            cursor: pointer;
+        }
+        .highlight {
+            color: var(--highlight-color);
+            background-color: var(--highlight-bg-color);
+            border-radius: 4px;
+            padding: 1px 3px;
+            margin: 0 1px;
+            display: inline-block;
+        }
+        #log-container {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            border: 1px solid #ddd;
+        }
+         h1, h2 {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <h1>SnapDek Studio</h1>
+
+    <div id="main-container">
+        <div id="input-panel">
+            <h2>Input</h2>
+            <textarea id="text" rows="15" placeholder="Enter your text here. Separate multiple entries with '##' on a new line. Text in (parentheses) or （full-width parentheses） will be ignored for audio generation but shown highlighted (without parentheses) in preview."></textarea>
+            <select id="voice">
+                <option value="de-DE-SeraphinaMultilingualNeural">de-DE-SeraphinaMultilingualNeural (Female)</option>
+                <option value="de-DE-FlorianMultilingualNeural">de-DE-FlorianMultilingualNeural (Male)</option>
+                <option value="de-DE-AmalaNeural">de-DE-AmalaNeural (Female)</option>
+                <option value="de-DE-ConradNeural">de-DE-ConradNeural (Male)</option>
+                <option value="de-DE-KatjaNeural">de-DE-KatjaNeural (Female)</option>
+                <option value="de-DE-KillianNeural">de-DE-KillianNeural (Male)</option>
+                <option value="zh-CN-XiaoxiaoNeural">zh-CN-XiaoxiaoNeural (Female)</option>
+                <option value="zh-CN-XiaoyiNeural">zh-CN-XiaoyiNeural (Female)</option>
+                <option value="zh-CN-YunjianNeural">zh-CN-YunjianNeural (Male)</option>
+                <option value="zh-CN-YunxiNeural">zh-CN-YunxiNeural (Male)</option>
+                <option value="zh-CN-YunxiaNeural">zh-CN-YunxiaNeural (Male)</option>
+                <option value="zh-CN-YunyangNeural">zh-CN-YunyangNeural (Male)</option>
+            </select>
+            <button id="generate">Generate Audio & TXT Files</button>
+            <button id="download" style="display: none;">Download Dek</button>
+            <div id="progress" style="display: none;">
+                <p>Status: <span id="status">Waiting</span></p>
+                <progress id="progressBar" value="0" max="100" style="width: 100%;"></progress>
+            </div>
+        </div>
+
+        <div id="preview-panel">
+            <h2 id="previewTitle">Preview</h2>
+            <ul id="previewList">
+                <!-- Preview items will be dynamically inserted here -->
+            </ul>
+        </div>
+    </div>
+
+    <div id="log-container">
+        <h2>Log</h2>
+        <div id="log"></div>
+    </div>
+    
+    <audio id="previewAudioPlayer" style="display: none;"></audio>
+
+    <script>
+        const apiUrl = 'https://oopstts.vercel.app/azure/tts';
+        const generateBtn = document.getElementById('generate');
+        const downloadBtn = document.getElementById('download');
+        const textArea = document.getElementById('text');
+        const voiceSelect = document.getElementById('voice');
+        const progressDiv = document.getElementById('progress');
+        const previewTitleElement = document.getElementById('previewTitle');
+        const previewList = document.getElementById('previewList');
+        const statusSpan = document.getElementById('status');
+        const progressBar = document.getElementById('progressBar');
+        const logDiv = document.getElementById('log');
+        const previewAudioPlayer = document.getElementById('previewAudioPlayer');
+
+        let zip = new JSZip();
+        let generatedAudioData = {}; // To store { index: blob }
+        let currentPreviewAudioUrl = null;
+
+
+        function log(message) {
+            console.log(message);
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${time}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function removeParentheses(text) {
+            return text.replace(/[（(][^）)]*?[)）]/g, '').trim();
+        }
+
+        function processTextForPreview(text) {
+            return text.replace(/[（(]([^）)]+?)[)）]/g, '<span class="highlight">$1</span>');
+        }
+
+        function updatePreview() {
+            const fullInputText = textArea.value;
+            const texts = fullInputText.split(/\n##\n/).map(t => t.trim()).filter(t => t.length > 0);
+
+            previewList.innerHTML = ''; // Clear previous preview items
+
+            let itemCount = 0;
+
+            if (texts.length === 0) {
+                if (fullInputText.trim().length > 0) {
+                    itemCount = 1;
+                    const singleTextEntry = fullInputText.trim();
+                    const processedTextForDisplay = processTextForPreview(singleTextEntry);
+                    const li = document.createElement('li');
+                    li.dataset.index = 0;
+                    li.innerHTML = `
+                        <span class="audio-icon-placeholder"></span>
+                        <span class="file-number">${itemCount}.</span>
+                        <div class="file-content">${processedTextForDisplay.replace(/\n/g, '<br>')}</div>
+                    `;
+                    previewList.appendChild(li);
+                } else {
+                     previewList.innerHTML = '<li><span class="file-content" style="color: #777; font-style: italic;">Type in the input area to see a preview.</span></li>';
+                }
+            } else {
+                itemCount = texts.length;
+                texts.forEach((textSegment, index) => {
+                    const processedTextForDisplay = processTextForPreview(textSegment);
+                    const li = document.createElement('li');
+                    li.dataset.index = index;
+                    li.innerHTML = `
+                        <span class="audio-icon-placeholder"></span>
+                        <span class="file-number">${index + 1}.</span>
+                        <div class="file-content">${processedTextForDisplay.replace(/\n/g, '<br>')}</div>
+                    `;
+                    previewList.appendChild(li);
+                });
+            }
+
+            if (itemCount > 0) {
+                previewTitleElement.textContent = `Preview (${itemCount} item${itemCount === 1 ? '' : 's'})`;
+            } else {
+                previewTitleElement.textContent = 'Preview';
+            }
+        }
+        
+        function playPreviewAudio(index) {
+            if (generatedAudioData[index]) {
+                if (currentPreviewAudioUrl) {
+                    URL.revokeObjectURL(currentPreviewAudioUrl); // Revoke previous URL
+                }
+                currentPreviewAudioUrl = URL.createObjectURL(generatedAudioData[index]);
+                previewAudioPlayer.src = currentPreviewAudioUrl;
+                previewAudioPlayer.play()
+                    .then(() => log(`Playing preview for item ${index + 1}`))
+                    .catch(e => {
+                        console.error("Error playing audio preview:", e);
+                        log(`Error playing audio preview for item ${index + 1}: ${e.message}`);
+                    });
+            } else {
+                log(`No audio data found for preview item ${index + 1}`);
+            }
+        }
+
+
+        textArea.addEventListener('input', updatePreview);
+        document.addEventListener('DOMContentLoaded', updatePreview);
+
+
+        generateBtn.addEventListener('click', generateAudio);
+
+        async function generateAudio() {
+            generatedAudioData = {}; // Reset stored audio for this batch
+            if (currentPreviewAudioUrl) { // Stop any playing preview and revoke its URL
+                previewAudioPlayer.pause();
+                URL.revokeObjectURL(currentPreviewAudioUrl);
+                currentPreviewAudioUrl = null;
+            }
+
+            zip = new JSZip();
+            const fullInputText = textArea.value;
+            log(`Starting generation process.`);
+            updatePreview(); // Ensure preview is rebuilt cleanly without old icons/listeners
+
+            const texts = fullInputText.split(/\n##\n/).map(t => t.trim()).filter(t => t.length > 0);
+            
+            if (texts.length === 0) {
+                if (fullInputText.trim().length > 0) {
+                    texts.push(fullInputText.trim());
+                } else {
+                    alert('Please enter some text.');
+                    log('No text entered for generation.');
+                    return;
+                }
+            }
+            log(`Number of entries to process: ${texts.length}`);
+
+            generateBtn.disabled = true;
+            downloadBtn.style.display = 'none';
+            progressDiv.style.display = 'block';
+            statusSpan.textContent = 'Preparing...';
+            progressBar.value = 0;
+
+            for (let i = 0; i < texts.length; i++) {
+                const originalEntryText = texts[i]; 
+                const audioText = removeParentheses(originalEntryText); 
+                const voice = voiceSelect.value;
+                const fileNameBase = `${(i + 1).toString().padStart(3, '0')}`;
+
+                statusSpan.textContent = `Generating ${i + 1}/${texts.length}: ${fileNameBase}`;
+                log(`Processing entry ${i + 1}/${texts.length}. Text for audio: "${audioText.substring(0, 50)}..."`);
+
+                const currentPreviewItemLi = previewList.querySelector(`li[data-index="${i}"]`);
+
+                if (!audioText) {
+                    log(`Skipping entry ${i + 1} as text for audio is empty after removing parentheses.`);
+                    zip.file(`${fileNameBase}.txt`, originalEntryText);
+                    log(`Created ${fileNameBase}.txt (original content) for skipped audio.`);
+                    // No audio icon for skipped items
+                } else {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: audioText, voice })
+                        });
+
+                        if (!response.ok) {
+                            const errorBody = await response.text();
+                            throw new Error(`API request failed for entry ${i+1} (status ${response.status}): ${errorBody}`);
+                        }
+
+                        const blob = await response.blob();
+                        generatedAudioData[i] = blob; // Store blob for preview
+                        zip.file(`${fileNameBase}.mp3`, blob);
+                        zip.file(`${fileNameBase}.txt`, originalEntryText);
+
+                        log(`Successfully generated ${fileNameBase}.mp3 and ${fileNameBase}.txt`);
+
+                        // Update UI for playback
+                        if (currentPreviewItemLi) {
+                            const iconPlaceholder = currentPreviewItemLi.querySelector('.audio-icon-placeholder');
+                            const contentDiv = currentPreviewItemLi.querySelector('.file-content');
+
+                            if (iconPlaceholder) {
+                                iconPlaceholder.innerHTML = '&#128266;'; // Speaker icon 🔊
+                                iconPlaceholder.classList.add('active');
+                                iconPlaceholder.title = `Play preview for item ${i + 1}`;
+                                iconPlaceholder.onclick = (e) => { e.stopPropagation(); playPreviewAudio(i); };
+                            }
+                            if (contentDiv) {
+                                contentDiv.classList.add('playable');
+                                contentDiv.title = `Play preview for item ${i + 1}`;
+                                contentDiv.onclick = () => playPreviewAudio(i);
+                            }
+                        }
+
+                    } catch (error) {
+                        console.error('Error generating audio for entry ' + (i + 1) + ':', error);
+                        log(`Error for entry ${i + 1}: ${error.message}.`);
+                        zip.file(`${fileNameBase}.txt`, originalEntryText); 
+                        log(`Created ${fileNameBase}.txt (original content) despite audio error for entry ${i+1}.`);
+                    }
+                }
+                progressBar.value = ((i + 1) / texts.length) * 100;
+            }
+
+            statusSpan.textContent = 'Generation Complete!';
+            log('All entries processed. DEK file ready for download if any files were generated.');
+            generateBtn.disabled = false;
+            if (Object.keys(zip.files).length > 0) {
+                downloadBtn.style.display = 'block';
+            } else {
+                log('No files were generated.');
+                 statusSpan.textContent = 'Generation complete (no files to download).';
+            }
+        }
+        
+        function getFormattedDateTime() {
+            const now = new Date();
+            const M = (now.getMonth() + 1).toString().padStart(2, '0');
+            const D = now.getDate().toString().padStart(2, '0');
+            const H = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const s = now.getSeconds().toString().padStart(2, '0');
+            return `${M}${D}_${H}${m}${s}`;
+        }
+
+        downloadBtn.addEventListener('click', async () => {
+            if (Object.keys(zip.files).length === 0) {
+                alert("No files to download. Please generate audio first or check if inputs were valid.");
+                log("Download attempt failed: No files in ZIP.");
+                return;
+            }
+            log("Preparing DEK file for download...");
+            try {
+                const content = await zip.generateAsync({ type: 'blob' });
+                const filename = `${getFormattedDateTime()}.dek`;
+                saveAs(content, filename);
+                log(`DEK file download initiated as ${filename}.`);
+            } catch (error) {
+                console.error("Error generating DEK (ZIP) file: ", error);
+                log(`Error generating DEK (ZIP) file: ${error.message}`);
+                alert("Error creating DEK file. Check console for details.");
+            }
+        });
+    </script>
+</body>
+</html>
