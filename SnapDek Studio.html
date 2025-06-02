@@ -3,80 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapDek Studio</title>
+    <title data-translate-key="title">SnapDek Studio</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --background-color: #ecf0f1;
-            --text-color: #34495e;
-            --highlight-color: #AF54DE;
-            --highlight-bg-color: #F3E6FB;
+            --primary-color: #10A37F; /* ChatGPT Green */
+            --secondary-color: #19C37D; /* ChatGPT Light Green (hover) */
+            --background-color: #202123; /* ChatGPT Dark Background */
+            --surface-color: #343541; /* ChatGPT Surface Area */
+            --text-color: #FFFFFF; /* White text */
+            --text-secondary-color: #ECECF1; /* Light gray text */
+            --highlight-color: #10A37F; /* Green for highlighted text */
+            --highlight-bg-color: rgba(16, 163, 127, 0.1); /* Subtle green background */
+            --border-color: #444654; /* Border color */
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0 auto;
-            padding: 20px;
+            padding: 16px;
             background-color: var(--background-color);
             color: var(--text-color);
+            position: relative;
+            max-width: 1200px;
+            line-height: 1.5;
+        }
+
+        /* Header with logo */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            margin-right: 12px;
+        }
+
+        #language-switcher {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 8px 14px;
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            width: auto;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        #language-switcher:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         #main-container {
             display: flex;
-            gap: 20px;
+            gap: 16px;
+            margin-top: 12px;
         }
 
-        #input-panel {
+        #input-panel, #preview-panel {
             flex: 1;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 16px;
+            background-color: var(--surface-color);
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         #preview-panel {
-            flex: 1;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-height: calc(100vh - 80px); 
+            max-height: calc(100vh - 100px); 
             overflow-y: auto;
         }
-        #preview-panel h2 {
+        
+        h1, h2 {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        h2 {
+            font-size: 16px;
             margin-top: 0;
+            margin-bottom: 12px;
+            color: var(--text-secondary-color);
         }
 
-        textarea, select, button {
+        textarea, select {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 10px;
+            padding-right: 30px;
+        }
+        
+        button {
             width: 100%;
             margin-bottom: 10px;
             padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            cursor: pointer;
+            border-radius: 6px;
             border: none;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+            font-size: 14px;
         }
+        
         button:hover {
             background-color: var(--secondary-color);
         }
+        
         button:disabled {
-            background-color: #ccc;
+            background-color: #3E3F4B;
+            color: #8E8EA0;
             cursor: not-allowed;
         }
 
         #progress {
-            margin-top: 20px;
+            margin-top: 16px;
         }
+        
+        progress {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--background-color);
+            overflow: hidden;
+        }
+        
+        progress::-webkit-progress-bar {
+            background: var(--background-color);
+            border-radius: 3px;
+        }
+        
+        progress::-webkit-progress-value {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
         #status {
-            font-weight: bold;
+            font-weight: 500;
+            color: var(--text-secondary-color);
+            font-size: 14px;
         }
 
         #previewList {
@@ -84,38 +181,47 @@
             padding: 0;
             margin: 0;
         }
+        
         #previewList li {
-            padding: 8px;
+            padding: 10px;
             margin: 6px 0;
-            background-color: #f9f9f9;
-            border-radius: 5px;
+            background-color: var(--background-color);
+            border-radius: 6px;
             display: flex;
             align-items: flex-start;
-            border: 1px solid #eee;
+            border: 1px solid var(--border-color);
         }
+        
+        #previewList li:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
         .audio-icon-placeholder {
             display: inline-block;
-            width: 22px; /* Space for icon */
-            height: 20px; /* Match line-height roughly */
+            width: 22px;
+            height: 20px;
             line-height: 20px;
             text-align: center;
             margin-right: 0px;
-            color: #aaa; /* Default color, changes when icon appears */
-            font-size: 16px; /* Icon size */
+            color: #8E8EA0;
+            font-size: 16px;
         }
-         .audio-icon-placeholder.active {
+        
+        .audio-icon-placeholder.active {
             cursor: pointer;
-            color: var(--primary-color); /* Or any color for active icon */
+            color: var(--primary-color);
         }
 
         .file-number {
-            min-width: 25px; /* original: 25px */
+            min-width: 25px;
             margin-right: 8px;
             text-align: right;
-            font-weight: bold;
+            font-weight: 500;
             font-size: 14px;
-            padding-top: 2px; 
+            padding-top: 2px;
+            color: var(--text-secondary-color);
         }
+        
         .file-content {
             flex-grow: 1;
             white-space: pre-wrap;
@@ -124,39 +230,62 @@
             line-height: 1.5;
             font-size: 14px;
         }
+        
         .file-content.playable {
             cursor: pointer;
         }
+        
         .highlight {
-            color: var(--highlight-color);
+            color: var(--primary-color);
             background-color: var(--highlight-bg-color);
-            border-radius: 4px;
+            border-radius: 3px;
             padding: 1px 3px;
             margin: 0 1px;
             display: inline-block;
         }
+        
         #log-container {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: var(--surface-color);
+            border-radius: 6px;
             max-height: 200px;
             overflow-y: auto;
-            font-size: 0.9em;
-            border: 1px solid #ddd;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
         }
-         h1, h2 {
-            color: var(--primary-color);
+        
+        #logOutput {
+            color: var(--text-secondary-color);
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        #previewPlaceholder {
+            color: #8E8EA0 !important;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <h1>SnapDek Studio</h1>
+    <div class="header">
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" fill="none"/>
+                <rect x="5" y="7.24963" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 7.24963)" fill="#FF4900"/>
+                <rect x="5" y="13.572" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 13.572)" fill="#FFBC00"/>
+                <rect x="5" y="19.8439" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 19.8439)" fill="#F5EC00"/>
+            </svg>
+        </div>
+        <h1 data-translate-key="heading">SnapDek Studio</h1>
+        <button id="language-switcher" data-translate-key="language-switcher">Switch Language</button>
+    </div>
 
     <div id="main-container">
         <div id="input-panel">
-            <h2>Input</h2>
-            <textarea id="text" rows="15" placeholder="Enter your text here. Separate multiple entries with '##' on a new line. Text in (parentheses) or （full-width parentheses） will be ignored for audio generation but shown highlighted (without parentheses) in preview."></textarea>
+            <h2 data-translate-key="input-panel-heading">Input</h2>
+            <textarea id="text" rows="15" placeholder="" data-translate-key="input-placeholder"></textarea>
             <select id="voice">
                 <option value="de-DE-SeraphinaMultilingualNeural">de-DE-SeraphinaMultilingualNeural (Female)</option>
                 <option value="de-DE-FlorianMultilingualNeural">de-DE-FlorianMultilingualNeural (Male)</option>
@@ -171,25 +300,26 @@
                 <option value="zh-CN-YunxiaNeural">zh-CN-YunxiaNeural (Male)</option>
                 <option value="zh-CN-YunyangNeural">zh-CN-YunyangNeural (Male)</option>
             </select>
-            <button id="generate">Generate Audio & TXT Files</button>
-            <button id="download" style="display: none;">Download Dek</button>
+            <button id="generate" data-translate-key="generate-button">Generate Audio & TXT Files</button>
+            <button id="download" style="display: none;" data-translate-key="download-button">Download Dek</button>
             <div id="progress" style="display: none;">
-                <p>Status: <span id="status">Waiting</span></p>
+                <p><span data-translate-key="status-label">Status: </span><span id="status">Waiting</span></p>
                 <progress id="progressBar" value="0" max="100" style="width: 100%;"></progress>
             </div>
         </div>
 
         <div id="preview-panel">
-            <h2 id="previewTitle">Preview</h2>
+            <h2 id="previewTitle" data-translate-key="preview-panel-heading">Preview</h2>
             <ul id="previewList">
                 <!-- Preview items will be dynamically inserted here -->
             </ul>
+            <p id="previewPlaceholder" data-translate-key="preview-placeholder" style="color: #888; text-align: center;">Type in the input area to see a preview.</p>
         </div>
     </div>
 
     <div id="log-container">
-        <h2>Log</h2>
-        <div id="log"></div>
+        <h2 data-translate-key="log-heading">Log</h2>
+        <pre id="logOutput"></pre>
     </div>
     
     <audio id="previewAudioPlayer" style="display: none;"></audio>
@@ -207,17 +337,82 @@
         const progressBar = document.getElementById('progressBar');
         const logDiv = document.getElementById('log');
         const previewAudioPlayer = document.getElementById('previewAudioPlayer');
+        const languageSwitcher = document.getElementById('language-switcher');
 
         let zip = new JSZip();
         let generatedAudioData = {}; // To store { index: blob }
         let currentPreviewAudioUrl = null;
 
+        const translations = {
+            en: {
+                title: "SnapDek Studio - Create Deks, In a Snap",
+                heading: "SnapDek Studio",
+                'language-switcher': "中文",
+                'input-panel-heading': "Input",
+                'input-placeholder': "Enter your text here. Separate multiple entries with '##' on a new line. Text in (parentheses) or （full-width parentheses） will be used for audio generation but shown highlighted (without parentheses) in preview.",
+                'generate-button': "Generate Audio & TXT Files",
+                'download-button': "Download Dek",
+                'status-label': "Status: ",
+                'preview-panel-heading': "Preview",
+                'preview-placeholder': "Type in the input area to see a preview.",
+                'log-heading': "Log"
+            },
+            zh: {
+                title: "SnapDek Studio - Create Deks, In a Snap",
+                heading: "SnapDek Studio",
+                'language-switcher': "English",
+                'input-panel-heading': "输入",
+                'input-placeholder': "在此输入文本。用新行上的“##”分隔多个条目。括号 () 或 （全角括号）中的文本将用于音频生成，但会在预览中突出显示（不带括号）。",
+                'generate-button': "生成音频和TXT文件",
+                'download-button': "下载Dek",
+                'status-label': "状态: ",
+                'preview-panel-heading': "预览",
+                'preview-placeholder': "在输入区域键入以查看预览。",
+                'log-heading': "日志"
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('language') || (navigator.language.startsWith('zh') ? 'zh' : 'en');
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('[data-translate-key]').forEach(element => {
+                const key = element.getAttribute('data-translate-key');
+                if (translations[lang] && translations[lang][key]) {
+                    if (element.tagName === 'TEXTAREA' && key === 'input-placeholder') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+            // Update language switcher button text based on the *new* current language
+            const langSwitcherButton = document.getElementById('language-switcher');
+            if (lang === 'en') {
+                langSwitcherButton.textContent = translations.en['language-switcher']; 
+            } else {
+                langSwitcherButton.textContent = translations.zh['language-switcher'];
+            }
+        }
+
+        function toggleLanguage() {
+            const newLang = currentLanguage === 'en' ? 'zh' : 'en';
+            setLanguage(newLang);
+        }
+
+        document.getElementById('language-switcher').addEventListener('click', toggleLanguage);
+
+        // Initial language setup on page load
+        setLanguage(currentLanguage);
 
         function log(message) {
-            console.log(message);
-            const time = new Date().toLocaleTimeString();
-            logDiv.innerHTML += `[${time}] ${message}<br>`;
-            logDiv.scrollTop = logDiv.scrollHeight;
+            const logOutput = document.getElementById('logOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.textContent += `[${timestamp}] ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight; // Scroll to bottom
         }
 
         function removeParentheses(text) {
@@ -292,10 +487,8 @@
             }
         }
 
-
         textArea.addEventListener('input', updatePreview);
         document.addEventListener('DOMContentLoaded', updatePreview);
-
 
         generateBtn.addEventListener('click', generateAudio);
 
@@ -373,7 +566,7 @@
                             const contentDiv = currentPreviewItemLi.querySelector('.file-content');
 
                             if (iconPlaceholder) {
-                                iconPlaceholder.innerHTML = '&#128266;'; // Speaker icon 🔊
+                                iconPlaceholder.innerHTML = '&#128266;'; // Speaker icon 
                                 iconPlaceholder.classList.add('active');
                                 iconPlaceholder.title = `Play preview for item ${i + 1}`;
                                 iconPlaceholder.onclick = (e) => { e.stopPropagation(); playPreviewAudio(i); };
