@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"> <!-- Added viewport-fit=cover -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Dek Player</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,8 +49,8 @@
             --fab-actual-bg-color: #333333;
             --fab-actual-icon-color: #FFFFFF;
             --fab-hover-opacity: 0.85;
-            --fab-size: 48px; 
-            --fab-icon-size: 20px; 
+            --fab-size: 48px; /* Adjusted size */
+            --fab-icon-size: 20px; /* Adjusted icon size */
         }
 
         body.page-dark-theme {
@@ -84,10 +84,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
-            margin: 0; 
-            padding: 0; /* Removed default body padding */
-            display: flex; 
-            min-height: 100vh; /* Ensure body takes full viewport height */
+            margin: 0; padding: 0; display: flex; min-height: 100vh;
             overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
@@ -96,33 +93,24 @@
             width: var(--sidebar-width);
             background-color: var(--sidebar-actual-bg);
             color: var(--sidebar-actual-text);
-            /* padding: 8px; Removed top/bottom padding from sidebar itself */
-            padding-left: 8px;
-            padding-right: 8px;
-            padding-top: env(safe-area-inset-top, 8px); /* Respect top notch */
-            /* padding-bottom will be handled by the theme switcher */
+            padding: 8px;
             box-sizing: border-box;
-            height: 100vh; /* Full viewport height */
+            height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
             display: flex;
             flex-direction: column;
-            /* overflow-y: auto; Moved to sidebar-scrollable-content */
+            overflow-y: auto;
             transition: transform 0.3s ease-in-out, background-color 0.3s, color 0.3s, border-color 0.3s;
             z-index: 200;
             border-right: 1px solid var(--sidebar-actual-border-color);
         }
-        #sidebar-scrollable-content { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            padding-top: 8px; /* Added padding here */
-            padding-bottom: 8px; /* Added padding here */
-        }
+        #sidebar-scrollable-content { flex-grow: 1; overflow-y: auto; }
         
         #sidebar-logo-container {
-            padding: 10px 8px; /* Original padding was 10px 8px */
-            margin-top: 0; /* Adjusted from 5px as sidebar has top safe area padding now */
+            padding: 10px 8px;
+            margin-top: 5px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -132,32 +120,21 @@
             width: auto;
         }
 
-        .upload-button-label-sidebar { display: block; background-color: var(--sidebar-actual-button-bg); color: var(--sidebar-actual-text); border: 1px solid var(--sidebar-actual-button-border); padding: 8px 12px; margin: 0 0 15px 0; /* Use 0 for left/right margin within sidebar-scrollable */ border-radius: 6px; font-size: 0.875em; font-weight: 500; cursor: pointer; text-align: center; transition: background-color .2s, border-color .2s, color .2s; }
+        .upload-button-label-sidebar { display: block; background-color: var(--sidebar-actual-button-bg); color: var(--sidebar-actual-text); border: 1px solid var(--sidebar-actual-button-border); padding: 8px 12px; margin: 0 8px 15px 8px; border-radius: 6px; font-size: 0.875em; font-weight: 500; cursor: pointer; text-align: center; transition: background-color .2s, border-color .2s, color .2s; }
         .upload-button-label-sidebar:hover { background-color: var(--sidebar-actual-button-hover-bg); }
-        #dekListSidebar { list-style: none; padding: 0; /* No padding here, items will have it */ margin: 0; }
+        #dekListSidebar { list-style: none; padding: 0 8px; margin: 0; }
         #dekListSidebar li { padding: 8px 12px; cursor: pointer; border-radius: 6px; margin-bottom: 3px; transition: background-color .15s ease-out, color .15s ease-out; font-size: 0.875em; color: var(--sidebar-actual-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #dekListSidebar li:hover { background-color: var(--sidebar-actual-item-hover-bg); }
         #dekListSidebar li.active-dek { background-color: var(--sidebar-actual-item-active-bg); font-weight: 500; }
-        
-        #sidebar-theme-switcher { 
-            padding: 10px 0; /* Use 0 for left/right margin within sidebar-scrollable */
-            margin-top: auto; 
-            border-top: 1px solid var(--sidebar-actual-border-color); 
-            display: flex; 
-            gap: 8px; 
-            transition: border-color 0.3s;
-            /* This is key for mobile bottom bar */
-            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-            flex-shrink: 0; /* Prevent shrinking */
-        }
+        #sidebar-theme-switcher { padding: 10px 8px; margin-top: auto; border-top: 1px solid var(--sidebar-actual-border-color); display: flex; gap: 8px; transition: border-color 0.3s; }
         .theme-button { flex: 1; background-color: transparent; color: var(--sidebar-actual-icon-color); border: 1px solid transparent; padding: 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
         .theme-button:hover { background-color: var(--sidebar-actual-icon-hover-bg); }
         .theme-button.active { background-color: var(--sidebar-actual-item-active-bg); border-color: var(--sidebar-actual-button-border); color: var(--sidebar-actual-text); }
         .theme-button svg { width: 18px; height: 18px; fill: currentColor; }
 
         #main-content { flex-grow: 1; margin-left: var(--sidebar-width); box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-color: var(--background-color); transition: background-color 0.3s; }
-        .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-bar-height); padding: 0 10px; padding-top: env(safe-area-inset-top, 0px); box-sizing: border-box; width: 100%; background-color: var(--bottom-sheet-bg); border-bottom: 1px solid var(--sidebar-actual-border-color); z-index: 100; flex-shrink: 0; color: var(--text-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
-        #main-content-wrapper { max-width:800px; width: 100%; margin:0 auto; padding: 0 var(--main-content-padding) calc(var(--main-content-padding) + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; flex-grow: 1; overflow-y: auto; position: relative; }
+        .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-bar-height); padding: 0 10px; box-sizing: border-box; width: 100%; background-color: var(--bottom-sheet-bg); border-bottom: 1px solid var(--sidebar-actual-border-color); z-index: 100; flex-shrink: 0; color: var(--text-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
+        #main-content-wrapper { max-width:800px; width: 100%; margin:0 auto; padding: 0 var(--main-content-padding) var(--main-content-padding); box-sizing: border-box; flex-grow: 1; overflow-y: auto; position: relative; }
         #hamburgerButton { display: none; background: transparent; border: none; color: var(--text-color); cursor: pointer; padding: 8px; margin-right: 8px; flex-shrink: 0; border-radius: 6px; transition: background-color 0.2s, color 0.3s; width: 36px; height: 36px; align-items: center; justify-content: center; }
         #hamburgerButton:hover { background-color: var(--item-hover-color); }
         #hamburgerButton svg { width: 20px; height: 20px; fill: currentColor; }
@@ -184,7 +161,7 @@
         /* Floating Action Buttons Area */
         .floating-action-buttons {
             position: fixed;
-            bottom: calc(30px + env(safe-area-inset-bottom, 0px)); /* Adjusted for safe area */
+            bottom: 30px; /* Adjusted position */
             right: 20px;
             display: flex;
             flex-direction: column;
@@ -192,17 +169,44 @@
             z-index: 1001;
             gap: 12px;
         }
-        .fab-button { background-color: var(--fab-actual-bg-color); color: var(--fab-actual-icon-color); border: none; border-radius: 50%; width: var(--fab-size); height: var(--fab-size); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.25); cursor: pointer; transition: opacity 0.2s ease-out, background-color 0.3s, color 0.3s; padding: 0; }
-        .fab-button:hover { opacity: var(--fab-hover-opacity); }
-        .fab-button:active { opacity: 1; }
-        .fab-button svg { width: var(--fab-icon-size); height: var(--fab-icon-size); fill: currentColor; }
-        .fab-button[disabled] { background-color: #565869; color: #8e8ea0; cursor: not-allowed; opacity: 0.6; }
+        .fab-button {
+            background-color: var(--fab-actual-bg-color);
+            color: var(--fab-actual-icon-color);
+            border: none;
+            border-radius: 50%;
+            width: var(--fab-size);
+            height: var(--fab-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            cursor: pointer;
+            transition: opacity 0.2s ease-out, background-color 0.3s, color 0.3s;
+            padding: 0;
+        }
+        .fab-button:hover {
+            opacity: var(--fab-hover-opacity);
+        }
+        .fab-button:active {
+            opacity: 1;
+        }
+        .fab-button svg {
+            width: var(--fab-icon-size);
+            height: var(--fab-icon-size);
+            fill: currentColor;
+        }
+        .fab-button[disabled] {
+            background-color: #565869;
+            color: #8e8ea0;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
 
 
         /* Bottom Sheet (Settings Menu) */
         #bottomSheetOverlay { position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.4);z-index:1000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s; }
         #bottomSheetOverlay.visible { opacity:1;visibility:visible;transition:opacity .3s ease,visibility 0s linear 0s; }
-        #bottomSheet { position:fixed;bottom:0;left:0;right:0;background-color:var(--bottom-sheet-bg);border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -2px 10px rgba(0,0,0,.15);padding-bottom:calc(15px + env(safe-area-inset-bottom, 0px));max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease-in-out, background-color 0.3s;z-index:1002; }
+        #bottomSheet { position:fixed;bottom:0;left:0;right:0;background-color:var(--bottom-sheet-bg);border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -2px 10px rgba(0,0,0,.15);padding-bottom:env(safe-area-inset-bottom,15px);max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease-in-out, background-color 0.3s;z-index:1002; }
         #bottomSheet.visible { transform:translateY(0); }
         .bottom-sheet-header { padding:15px 20px;font-size:1.1em;font-weight:700;color:var(--text-color);border-bottom:1px solid var(--sidebar-actual-border-color);background-color:var(--bottom-sheet-header-bg);border-top-left-radius:16px;border-top-right-radius:16px;display:flex;justify-content:space-between;align-items:center; transition: background-color 0.3s, border-color 0.3s, color 0.3s;}
         .bottom-sheet-close { background:0 0;border:none;font-size:1.5em;color:var(--text-color);cursor:pointer;padding:5px;line-height:1;margin:0;width:auto; transition: color 0.3s;}
@@ -232,8 +236,8 @@
             .bottom-sheet-content { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
         }
         @media (max-width: 480px) {
-            .fab-button { width: 44px; height: 44px; }
-            .fab-button svg { width: 18px; height: 18px; }
+            .fab-button { width: 44px; height: 44px; } /* Adjusted for small screens */
+            .fab-button svg { width: 18px; height: 18px; } /* Adjusted icon size for small screens */
             #bottomSheet { max-height: 85vh; }
             #currentDekTitle { font-size: 0.9em; }
             #headerPlaybackInfo { font-size: 0.8em; padding: 1px 4px; }
@@ -281,10 +285,10 @@
 
     <div class="floating-action-buttons">
         <button id="fab_toggleVisibility" class="fab-button" title="隐藏/显示选中" aria-label="隐藏/显示选中">
-            <!-- SVG will be inserted by JS -->
+            <!-- Show/Hide Icon SVG will be inserted here by JS -->
         </button>
         <button id="fab_playPauseButton" class="fab-button" title="播放/暂停" aria-label="播放/暂停" disabled>
-            <!-- SVG will be inserted by JS -->
+            <!-- Play/Pause Icon SVG will be inserted here by JS -->
         </button>
         <button id="settingsButton" class="fab-button" title="设置" aria-label="打开设置">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -297,7 +301,7 @@
     <div id="bottomSheet">
         <div class="bottom-sheet-header">
             <span>播放器设置</span>
-            <button class="bottom-sheet-close" aria-label="关闭设置">×</button>
+            <button class="bottom-sheet-close" aria-label="关闭设置">&times;</button>
         </div>
         <div class="bottom-sheet-content">
             <div class="bottom-sheet-section">
@@ -327,7 +331,7 @@
     <audio id="audioPlayer" style="display: none;"></audio>
 
     <script>
-        // --- DOM Elements (same) ---
+        // --- DOM Elements ---
         const sidebar = document.getElementById('sidebar');
         const dekListSidebar = document.getElementById('dekListSidebar');
         const dekFileUploadInputSidebar = document.getElementById('dekFileUploadInputSidebar');
@@ -354,14 +358,14 @@
         const themeButtonLight = document.getElementById('theme-button-light');
         const themeButtonDark = document.getElementById('theme-button-dark');
 
-        // --- SVG Icon Definitions (Updated) ---
+        // --- SVG Icon Definitions ---
         const svgIconPlay = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 2.25195C4 1.27741 5.06571 0.677697 5.89871 1.18347L16.3459 7.52636C17.1476 8.01311 17.1476 9.17661 16.3459 9.66336L5.89871 16.0062C5.06571 16.512 4 15.9123 4 14.9378V2.25195Z" fill="currentColor"/></svg>`;
         const svgIconPause = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.35875 16.34H6.68806C7.57686 16.34 8.04682 15.9069 8.04682 15.0782V2.25244C8.04682 1.39551 7.57686 1 6.68806 1H4.35875C3.46995 1 3 1.43318 3 2.25244V15.0782C3 15.9069 3.46995 16.34 4.35875 16.34ZM11.7859 16.34H14.105C15.004 16.34 15.4638 15.9069 15.4638 15.0782V2.25244C15.4638 1.39551 15.004 1 14.105 1H11.7859C10.8869 1 10.417 1.43318 10.417 2.25244V15.0782C10.417 15.9069 10.8869 16.34 11.7859 16.34Z" fill="currentColor"/></svg>`;
-        const svgIconShow = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_44_show)"><g filter="url(#filter0_d_51_44_show)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g></g><defs><filter id="filter0_d_51_44_show" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_44"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_44" result="shape"/></filter><clipPath id="clip0_51_44_show"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
-        const svgIconHide = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_63_hide)"><g filter="url(#filter0_d_51_63_hide)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g><path d="M1.95314 3.25842C2.47545 2.61317 3.42194 2.5135 4.06719 3.03581L14.884 11.7916C15.5292 12.3139 15.6289 13.2604 15.1066 13.9057V13.9057C14.5843 14.5509 13.6378 14.6506 12.9925 14.1283L2.17575 5.37247C1.5305 4.85016 1.43083 3.90367 1.95314 3.25842V3.25842Z" fill="currentColor"/></g><defs><filter id="filter0_d_51_63_hide" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_63"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_63" result="shape"/></filter><clipPath id="clip0_51_63_hide"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+        const svgIconShow = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_fab_show)"><g filter="url(#filter0_d_fab_show)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g></g><defs><filter id="filter0_d_fab_show" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_44"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_44" result="shape"/></filter><clipPath id="clip0_fab_show"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+        const svgIconHide = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_fab_hide)"><g filter="url(#filter0_d_fab_hide)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g><path d="M1.95314 3.25842C2.47545 2.61317 3.42194 2.5135 4.06719 3.03581L14.884 11.7916C15.5292 12.3139 15.6289 13.2604 15.1066 13.9057V13.9057C14.5843 14.5509 13.6378 14.6506 12.9925 14.1283L2.17575 5.37247C1.5305 4.85016 1.43083 3.90367 1.95314 3.25842V3.25842Z" fill="currentColor"/></g><defs><filter id="filter0_d_fab_hide" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_63"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_63" result="shape"/></filter><clipPath id="clip0_fab_hide"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+
 
         // --- Global State, IndexedDB, Utility Functions ---
-        // ... (rest of the JS code remains the same as the previous version) ...
         let currentDekName = null; let currentDekItems = []; let currentPlaylistIndex = -1;
         let currentRepeatCount = 0; let isHiding = false; let currentDekZipBuffer = null;
         const STORAGE_KNOWN_DEKS = 'dekPlayer_knownDeks';
@@ -379,6 +383,7 @@
         function processText(text) { if (typeof text !== 'string') return ""; return text.trim().replace(/[（(]([^）)]+)[）)]/g, '<span class="highlight">$1</span>');}
         function sortCurrentDekItems() { if (!currentDekItems || currentDekItems.length === 0) return; const sortOrder = bs_sortOrder.value; currentDekItems.sort((a, b) => { const nameA = a.audioName || a.name || ""; const nameB = b.audioName || b.name || ""; return sortOrder === 'asc' ? nameA.localeCompare(nameB, 'zh-Hans-CN-pinyin') : nameB.localeCompare(nameA, 'zh-Hans-CN-pinyin'); });}
 
+        // --- Theme Switcher Logic ---
         function applyAppTheme(theme) {
             if (theme === 'dark') {
                 sidebar.classList.add('sidebar-dark-theme');
@@ -399,6 +404,7 @@
         themeButtonLight.addEventListener('click', () => applyAppTheme('light'));
         themeButtonDark.addEventListener('click', () => applyAppTheme('dark'));
 
+        // --- Initialization ---
         window.addEventListener('load', async () => {
             fab_playPauseButton.innerHTML = svgIconPlay;
             fab_toggleVisibility.innerHTML = svgIconShow;
@@ -412,6 +418,7 @@
             updateButtonStatesAll(); updateDekTitle(); updatePlaybackInfoAll();
         });
 
+        // --- Event Listeners ---
         hamburgerButton.addEventListener('click', () => { sidebar.classList.toggle('open');});
         mainContentWrapper.addEventListener('click', (event) => {
             if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
@@ -438,12 +445,14 @@
         bs_deleteCurrentDekButton.addEventListener('click', handleDeleteCurrentDek);
         bs_playbackSpeed.addEventListener('change', () => { if(audioPlayer.src)audioPlayer.playbackRate=parseFloat(bs_playbackSpeed.value);});
 
+        // --- DEK Deletion ---
         async function handleDeleteCurrentDek() {
             if (!currentDekName) { showStatus("没有选中的DEK可删除。", "info"); return; }
             const confirmDelete = window.confirm(`确定要删除DEK "${decodeFileName(currentDekName)}" 吗？此操作无法撤销。`);
             if (confirmDelete) { showStatus(`正在删除 ${decodeFileName(currentDekName)}...`, "info", 0); try { await clearAudioDataForDek(currentDekName); localStorage.removeItem(STORAGE_DEK_DATA_PREFIX + currentDekName); let knownDeks = getKnownDekNames(); const indexToRemove = knownDeks.indexOf(currentDekName); if (indexToRemove > -1) { knownDeks.splice(indexToRemove, 1); saveKnownDekNames(knownDeks); } if (localStorage.getItem('dekPlayer_lastOpenedDek') === currentDekName) { localStorage.removeItem('dekPlayer_lastOpenedDek'); } showStatus(`"${decodeFileName(currentDekName)}" 已成功删除。`, "success"); const dekNameToSelectAfterDelete = knownDeks.length > 0 ? knownDeks[0] : null; resetPlayerState(true); populateDekSidebarList(); if (dekNameToSelectAfterDelete) { await loadDekDataFromStorage(dekNameToSelectAfterDelete); } } catch (error) { console.error("删除DEK时出错:", error); showStatus(`删除 "${decodeFileName(currentDekName)}" 失败: ${error.message}`, "error"); } finally { closeBottomSheet(); } }
         }
 
+        // --- DEK Processing & Storage Functions ---
         function getKnownDekNames() { const names=JSON.parse(localStorage.getItem(STORAGE_KNOWN_DEKS))||[]; return names.filter(name=>name&&typeof name==='string');}
         function saveKnownDekNames(names) { localStorage.setItem(STORAGE_KNOWN_DEKS,JSON.stringify(names.filter(name=>name&&typeof name==='string')) );}
         function addKnownDekName(name) { if(!name||typeof name!=='string')return; let names=getKnownDekNames(); if(!names.includes(name)){names.push(name);saveKnownDekNames(names);}}
@@ -489,9 +498,10 @@
         }
         function saveCurrentDekMetadataToStorage() { if (!currentDekName || typeof currentDekName !== 'string') return; const dataToStore = { dekName: currentDekName, files: currentDekItems.map(item => { const { audioData, blobUrl, ...storableItem } = item; return storableItem; })}; try { localStorage.setItem(STORAGE_DEK_DATA_PREFIX + currentDekName, JSON.stringify(dataToStore)); console.log("已保存元数据到 localStorage: " + currentDekName); } catch (e) { console.error("保存元数据到localStorage失败:",e);showStatus("保存元数据到浏览器失败!","error");}}
 
+        // --- UI Population & Updates ---
         function populateAudioList() { audioList.innerHTML='';if(!currentDekItems||currentDekItems.length===0){updatePlaybackInfoAll();if(currentDekName)showStatus(`DEK "${decodeFileName(currentDekName)}" 中没有可播放的项目。`,'info');else showStatus("请选择或上传一个DEK文件。", "info");updateButtonStatesAll();return;}currentDekItems.forEach((item,index)=>{const li=document.createElement('li');li.dataset.index=index;li.dataset.filename=item.audioName||item.name;const chkCont=document.createElement('div');chkCont.className='checkbox-container';const chk=document.createElement('input');chk.type='checkbox';chk.checked=item.isChecked||false;chk.addEventListener('change',()=>{currentDekItems[index].isChecked=chk.checked;updateListVisibility();saveCurrentDekMetadataToStorage();});chkCont.appendChild(chk);li.appendChild(chkCont);const numSpan=document.createElement('span');numSpan.className='file-number';numSpan.textContent=`${index+1}.`;li.appendChild(numSpan);const contSpan=document.createElement('span');contSpan.className='file-content';contSpan.innerHTML=item.textContent?processText(item.textContent):decodeFileName(item.audioName||item.name);li.appendChild(contSpan);li.addEventListener('click',(e)=>{if(e.target!==chk&&!chkCont.contains(e.target)){playAudio(index);}});audioList.appendChild(li);}); updateListVisibility();updatePlaybackInfoAll();updateButtonStatesAll();}
         function updateListVisibility() { const items=audioList.getElementsByTagName('li');for(let i=0;i<items.length;i++){const itemEl=items[i];const dekIt=currentDekItems[i];if(dekIt){if(isHiding&&dekIt.isChecked){itemEl.classList.add('hidden');}else{itemEl.classList.remove('hidden');}}}}
-        function updateButtonStatesAll() { const hasDekLoadedAndItems=currentDekName&¤tDekItems.length>0;fab_playPauseButton.disabled=!hasDekLoadedAndItems;fab_toggleVisibility.disabled=!hasDekLoadedAndItems;bs_downloadDekButton.disabled=!currentDekZipBuffer;bs_sortOrder.disabled=!hasDekLoadedAndItems;bs_deleteCurrentDekButton.disabled=!currentDekName;bs_repeatCount.disabled=!hasDekLoadedAndItems;bs_playbackSpeed.disabled=!hasDekLoadedAndItems;bs_playMode.disabled=!hasDekLoadedAndItems;}
+        function updateButtonStatesAll() { const hasDekLoadedAndItems=currentDekName&&currentDekItems.length>0;fab_playPauseButton.disabled=!hasDekLoadedAndItems;fab_toggleVisibility.disabled=!hasDekLoadedAndItems;bs_downloadDekButton.disabled=!currentDekZipBuffer;bs_sortOrder.disabled=!hasDekLoadedAndItems;bs_deleteCurrentDekButton.disabled=!currentDekName;bs_repeatCount.disabled=!hasDekLoadedAndItems;bs_playbackSpeed.disabled=!hasDekLoadedAndItems;bs_playMode.disabled=!hasDekLoadedAndItems;}
         function resetPlayerState(fullReset = true) { 
             audioPlayer.pause();audioPlayer.src=''; 
             fab_playPauseButton.innerHTML = svgIconPlay;
@@ -501,6 +511,7 @@
         function updateDekTitle() { currentDekTitleElement.textContent = currentDekName ? decodeFileName(currentDekName) : "播放器"; }
         function updatePlaybackInfoAll() { const text = currentDekItems.length > 0 && currentPlaylistIndex >= 0 && currentPlaylistIndex < currentDekItems.length ? `${currentPlaylistIndex + 1} / ${currentDekItems.length}` : '--/--'; headerPlaybackInfoElement.textContent = text; }
 
+        // --- Playback Logic ---
         async function playAudio(index) { 
             if(index<0||index>=currentDekItems.length)return;
             const item=currentDekItems[index];
@@ -535,10 +546,10 @@
                 }
             }; 
         }
-        function findNextVisiblePlayableItem(currentIndex) { for(let i=currentIndex+1;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){return i;}} if(bs_playMode.value==='auto'&¤tDekItems.length>0){for(let i=0;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){if(i===currentIndex&¤tDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length<=1){if(currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length>1)continue;}else if(i===currentIndex){continue;}return i;}}}return-1;}
+        function findNextVisiblePlayableItem(currentIndex) { for(let i=currentIndex+1;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){return i;}} if(bs_playMode.value==='auto'&&currentDekItems.length>0){for(let i=0;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){if(i===currentIndex&&currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length<=1){if(currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length>1)continue;}else if(i===currentIndex){continue;}return i;}}}return-1;}
         
         function togglePlayPause() { 
-            if(!audioPlayer.src&¤tDekItems.length>0){
+            if(!audioPlayer.src&&currentDekItems.length>0){
                 const firstPlayable=findNextVisiblePlayableItem(-1);
                 if(firstPlayable!==-1){playAudio(firstPlayable);}
                 else{showStatus("播放列表中没有可见的可播放条目。","info");}
@@ -561,6 +572,7 @@
         }
         function highlightPlayingItem(filenameToHighlight) { const items=audioList.getElementsByTagName('li');for(let item of items){item.classList.remove('current-playing');if(item.dataset.filename===filenameToHighlight){item.classList.add('current-playing');item.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});}}}
 
+        // --- Download Updated DEK ---
         async function downloadUpdatedDek() {
             if (!currentDekName || !currentDekItems.length || !currentDekZipBuffer) {
                 showStatus("没有当前DEK或DEK内容无法下载。", "error"); return;
@@ -590,6 +602,7 @@
                 showStatus(`下载失败: ${error.message}`, "error");
             } finally { closeBottomSheet(); }
         }
+        // PWA Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
             .then(registration => console.log('Service Worker registered with scope:', registration.scope))
