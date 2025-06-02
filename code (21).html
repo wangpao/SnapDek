@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Dek Player</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Dek Player">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <meta name="theme-color" content="#FFFFFF">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            /* Main Page Colors */
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #F7F7F8;
+            --text-color: #1f2937;
+            --item-hover-color: #e9e9e9;
+            --highlight-color: #AF54DE;
+            --highlight-bg-color: #F3E6FB;
+            --button-action-color: #e67e22;
+            --button-danger-color: #e74c3c;
+            
+            --bottom-sheet-bg: #ffffff;
+            --bottom-sheet-header-bg: #f8f9fa;
+            --header-text-color: var(--text-color);
+            --header-bar-height: 50px;
+            --main-content-padding: 15px;
+            
+            /* Sidebar Base Variables */
+            --sidebar-width: 260px;
+
+            /* DEFAULT: Light Theme for Sidebar */
+            --sidebar-actual-bg: #ffffff;
+            --sidebar-actual-text: #343541;
+            --sidebar-actual-item-hover-bg: #f0f0f0;
+            --sidebar-actual-item-active-bg: #e9e9e9;
+            --sidebar-actual-border-color: #e5e7eb;
+            --sidebar-actual-button-bg: #f0f0f0;
+            --sidebar-actual-button-hover-bg: #e0e0e0;
+            --sidebar-actual-button-border: #d1d5db;
+            --sidebar-actual-icon-color: #565869;
+            --sidebar-actual-icon-hover-bg: #f0f0f0;
+
+            /* FAB Styling (Defaults to suit light page theme) */
+            --fab-actual-bg-color: #333333;
+            --fab-actual-icon-color: #FFFFFF;
+            --fab-hover-opacity: 0.85;
+            --fab-size: 44px;
+            --fab-icon-size: 18px;
+        }
+
+        body.page-dark-theme {
+            --background-color: #121212;
+            --text-color: #E0E0E0;
+            --item-hover-color: #2a2a2a;
+            --bottom-sheet-bg: #1E1E1E;
+            --bottom-sheet-header-bg: #2a2a2a;
+            --header-text-color: var(--text-color);
+            --highlight-bg-color: #3a2f44;
+
+            --fab-actual-bg-color: #F0F0F0;
+            --fab-actual-icon-color: #333333;
+        }
+
+        #sidebar.sidebar-dark-theme {
+            --sidebar-actual-bg: #202123;
+            --sidebar-actual-text: #ECECEC;
+            --sidebar-actual-item-hover-bg: #2A2B32;
+            --sidebar-actual-item-active-bg: #343541;
+            --sidebar-actual-border-color: #3A3B3C;
+            --sidebar-actual-button-bg: #343541;
+            --sidebar-actual-button-hover-bg: #40414F;
+            --sidebar-actual-button-border: #4A4B52;
+            --sidebar-actual-icon-color: #C5C5D2;
+            --sidebar-actual-icon-hover-bg: #2A2B32;
+        }
+
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0; padding: 0; display: flex; min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-actual-bg);
+            color: var(--sidebar-actual-text);
+            padding: 8px;
+            box-sizing: border-box;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out, background-color 0.3s, color 0.3s, border-color 0.3s;
+            z-index: 200;
+            border-right: 1px solid var(--sidebar-actual-border-color);
+        }
+        #sidebar-scrollable-content { flex-grow: 1; overflow-y: auto; }
+        
+        #sidebar-logo-container {
+            padding: 10px 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        #sidebar-logo-container svg {
+            height: 28px; 
+            width: auto;
+            /* filter: var(--sidebar-logo-filter); Removed */
+        }
+
+        .upload-button-label-sidebar { display: block; background-color: var(--sidebar-actual-button-bg); color: var(--sidebar-actual-text); border: 1px solid var(--sidebar-actual-button-border); padding: 8px 12px; margin: 0 8px 15px 8px; border-radius: 6px; font-size: 0.875em; font-weight: 500; cursor: pointer; text-align: center; transition: background-color .2s, border-color .2s, color .2s; }
+        .upload-button-label-sidebar:hover { background-color: var(--sidebar-actual-button-hover-bg); }
+        #dekListSidebar { list-style: none; padding: 0 8px; margin: 0; }
+        #dekListSidebar li { padding: 8px 12px; cursor: pointer; border-radius: 6px; margin-bottom: 3px; transition: background-color .15s ease-out, color .15s ease-out; font-size: 0.875em; color: var(--sidebar-actual-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #dekListSidebar li:hover { background-color: var(--sidebar-actual-item-hover-bg); }
+        #dekListSidebar li.active-dek { background-color: var(--sidebar-actual-item-active-bg); font-weight: 500; }
+        #sidebar-theme-switcher { padding: 10px 8px; margin-top: auto; border-top: 1px solid var(--sidebar-actual-border-color); display: flex; gap: 8px; transition: border-color 0.3s; }
+        .theme-button { flex: 1; background-color: transparent; color: var(--sidebar-actual-icon-color); border: 1px solid transparent; padding: 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+        .theme-button:hover { background-color: var(--sidebar-actual-icon-hover-bg); }
+        .theme-button.active { background-color: var(--sidebar-actual-item-active-bg); border-color: var(--sidebar-actual-button-border); color: var(--sidebar-actual-text); }
+        .theme-button svg { width: 18px; height: 18px; fill: currentColor; }
+
+        #main-content { flex-grow: 1; margin-left: var(--sidebar-width); box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-color: var(--background-color); transition: background-color 0.3s; }
+        .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-bar-height); padding: 0 10px; box-sizing: border-box; width: 100%; background-color: var(--bottom-sheet-bg); border-bottom: 1px solid var(--sidebar-actual-border-color); z-index: 100; flex-shrink: 0; color: var(--text-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
+        #main-content-wrapper { max-width:800px; width: 100%; margin:0 auto; padding: 0 var(--main-content-padding) var(--main-content-padding); box-sizing: border-box; flex-grow: 1; overflow-y: auto; position: relative; }
+        #hamburgerButton { display: none; background: transparent; border: none; color: var(--text-color); cursor: pointer; padding: 8px; margin-right: 8px; flex-shrink: 0; border-radius: 6px; transition: background-color 0.2s, color 0.3s; width: 36px; height: 36px; align-items: center; justify-content: center; }
+        #hamburgerButton:hover { background-color: var(--item-hover-color); }
+        #hamburgerButton svg { width: 20px; height: 20px; fill: currentColor; }
+        #currentDekTitle { font-size: 1.0em; font-weight: 600; color: var(--text-color); text-align: center; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0 5px; transition: color 0.3s;}
+        #headerPlaybackInfo { font-size: 0.9em; color: var(--text-color); font-weight: normal; white-space: nowrap; flex-shrink: 0; padding: 2px 6px; background-color: var(--item-hover-color); border-radius: 4px; transition: background-color 0.3s, color 0.3s;}
+
+        /* Audio List styles */
+        #audioList { list-style-type: none; padding: 0; margin: 10px 0 0; }
+        #audioList li { cursor:pointer;padding:12px;margin:8px 0;background-color:var(--bottom-sheet-bg); border-radius:5px;transition:all .3s;display:flex;align-items:flex-start;border:2px solid transparent;box-shadow:0 2px 4px rgba(0,0,0,.05); color: var(--text-color); }
+        @media (hover:hover) and (pointer:fine){#audioList li:hover{background-color:var(--item-hover-color);}}
+        @media (hover:none){#audioList li:active{background-color:var(--item-hover-color);}}
+        #audioList li.current-playing { border-color:var(--secondary-color);box-shadow:0 0 10px rgba(46,204,113,.3); }
+        .checkbox-container { display:flex;align-items:center;margin-right:10px;padding-top:2px; }
+        .checkbox-container input[type=checkbox] { margin-right:5px;transform:scale(1.2); }
+        .file-number { min-width:30px;margin-right:10px;text-align:right;font-weight:700;color:var(--text-color);padding-top:1px; transition: color 0.3s;}
+        .file-content { flex-grow:1;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;line-height:1.6;color:var(--text-color); transition: color 0.3s;}
+        .highlight { color:var(--highlight-color);background-color:var(--highlight-bg-color);border-radius:4px;padding:2px 4px;margin:0 2px;display:inline-block; transition: background-color 0.3s, color 0.3s;}
+        .hidden { display:none!important; }
+
+        #status-message { text-align:center;margin-top:10px;font-weight:700;min-height:1.5em; color: var(--text-color); transition: color 0.3s;}
+        #status-message.success { color:green; } #status-message.error { color:red; }
+        
+
+        /* Floating Action Buttons Area */
+        .floating-action-buttons { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; z-index: 1001; gap: 12px; }
+        .fab-button { background-color: var(--fab-actual-bg-color); color: var(--fab-actual-icon-color); border: none; border-radius: 50%; width: var(--fab-size); height: var(--fab-size); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.25); cursor: pointer; transition: opacity 0.2s ease-out, background-color 0.3s, color 0.3s; padding: 0; }
+        .fab-button:hover { opacity: var(--fab-hover-opacity); }
+        .fab-button:active { opacity: 1; }
+        .fab-button svg { width: var(--fab-icon-size); height: var(--fab-icon-size); fill: currentColor; }
+        .fab-button[disabled] { background-color: #565869; color: #8e8ea0; cursor: not-allowed; opacity: 0.6; }
+
+
+        /* Bottom Sheet (Settings Menu) */
+        #bottomSheetOverlay { position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.4);z-index:1000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s; }
+        #bottomSheetOverlay.visible { opacity:1;visibility:visible;transition:opacity .3s ease,visibility 0s linear 0s; }
+        #bottomSheet { position:fixed;bottom:0;left:0;right:0;background-color:var(--bottom-sheet-bg);border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -2px 10px rgba(0,0,0,.15);padding-bottom:env(safe-area-inset-bottom,15px);max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease-in-out, background-color 0.3s;z-index:1002; }
+        #bottomSheet.visible { transform:translateY(0); }
+        .bottom-sheet-header { padding:15px 20px;font-size:1.1em;font-weight:700;color:var(--text-color);border-bottom:1px solid var(--sidebar-actual-border-color);background-color:var(--bottom-sheet-header-bg);border-top-left-radius:16px;border-top-right-radius:16px;display:flex;justify-content:space-between;align-items:center; transition: background-color 0.3s, border-color 0.3s, color 0.3s;}
+        .bottom-sheet-close { background:0 0;border:none;font-size:1.5em;color:var(--text-color);cursor:pointer;padding:5px;line-height:1;margin:0;width:auto; transition: color 0.3s;}
+        .bottom-sheet-content { padding:15px 20px;display:grid;gap:15px; }
+        .bottom-sheet-section { margin-bottom:10px; }
+        .bottom-sheet-section h3 { font-size:.9em;color: #777; margin-top:0;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px; transition: color 0.3s;}
+        body.page-dark-theme .bottom-sheet-section h3 { color: #aaa; }
+        #bottomSheet button, #bottomSheet select { background-color:var(--item-hover-color);color:var(--text-color);border:1px solid var(--sidebar-actual-button-border); transition: background-color 0.3s, border-color 0.3s, color 0.3s;}
+        #bottomSheet button:hover, #bottomSheet select:hover { background-color:var(--sidebar-actual-button-hover-bg);border-color:var(--sidebar-actual-button-border);}
+        #bottomSheet button.action { background-color:var(--button-action-color);color:#fff;border:none;}
+        #bottomSheet button.action:hover { background-color:#d35400;}
+        #bottomSheet button.danger { background-color: var(--button-danger-color); color: white; border: none; }
+        #bottomSheet button.danger:hover { background-color: #c0392b; }
+
+
+        /* Mobile View Adjustments */
+        @media (max-width: 768px) {
+            #sidebar { transform:translateX(-100%); box-shadow:2px 0 5px rgba(0,0,0,.2); }
+            #sidebar.open { transform:translateX(0); }
+            #main-content { margin-left:0; width:100%; }
+            #hamburgerButton { display:flex; }
+            .header-bar { left: 0; }
+            #currentDekTitle { text-align: left; margin-left: 5px; }
+             .bottom-sheet-content { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 601px) {
+            .bottom-sheet-content { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+        }
+        @media (max-width: 480px) {
+            .fab-button { width: 40px; height: 40px; }
+            .fab-button svg { width: 16px; height: 16px; }
+            #bottomSheet { max-height: 85vh; }
+            #currentDekTitle { font-size: 0.9em; }
+            #headerPlaybackInfo { font-size: 0.8em; padding: 1px 4px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside id="sidebar">
+        <div id="sidebar-scrollable-content">
+            <div id="sidebar-logo-container">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Removed background rect -->
+                    <rect x="5" y="7.24963" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 7.24963)" fill="#FF4900"/>
+                    <rect x="5" y="13.572" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 13.572)" fill="#FFBC00"/>
+                    <rect x="5" y="19.8439" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 19.8439)" fill="#F5EC00"/>
+                </svg>
+            </div>
+            <label for="dekFileUploadInputSidebar" class="upload-button-label-sidebar">Upload new dek</label>
+            <input type="file" id="dekFileUploadInputSidebar" style="display: none;" accept=".dek">
+            <ul id="dekListSidebar"></ul>
+        </div>
+        <div id="sidebar-theme-switcher">
+            <button id="theme-button-light" class="theme-button" aria-label="浅色模式">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zm-9-7c0-.55-.45-1-1-1V3c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1s1-.45 1-1zm0 12c0-.55-.45-1-1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1s1-.45 1-1zm6.36-8.64c-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41zm-11.32 8.49c-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41zM4.93 4.93c-.39-.39-1.02-.39-1.41 0L2.1 6.34c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41zm12.73 12.73c-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41z"></path></svg>
+            </button>
+            <button id="theme-button-dark" class="theme-button" aria-label="深色模式">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z"></path></svg>
+            </button>
+        </div>
+    </aside>
+
+    <main id="main-content">
+        <div class="header-bar">
+             <button id="hamburgerButton" aria-label="打开边栏">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z" fill="currentColor"></path></svg>
+            </button>
+            <span id="currentDekTitle">SnapDek</span>
+            <span id="headerPlaybackInfo">--/--</span>
+        </div>
+        <div id="main-content-wrapper">
+            <div id="status-message"></div>
+            <ul id="audioList"></ul>
+        </div>
+    </main>
+
+    <div class="floating-action-buttons">
+        <button id="fab_toggleVisibility" class="fab-button" title="隐藏/显示选中" aria-label="隐藏/显示选中">
+            <!-- Show Icon SVG will be inserted here by JS -->
+        </button>
+        <button id="fab_playPauseButton" class="fab-button" title="播放/暂停" aria-label="播放/暂停" disabled>
+            <!-- Play Icon SVG will be inserted here by JS -->
+        </button>
+        <button id="settingsButton" class="fab-button" title="设置" aria-label="打开设置">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.66184 17.6183C7.74405 17.6183 7 16.8743 7 15.9565C7 15.0387 7.74405 14.2947 8.66184 14.2947C9.57963 14.2947 10.3237 15.0387 10.3237 15.9565C10.3237 16.8743 9.57963 17.6183 8.66184 17.6183ZM8.66184 10.971C7.74405 10.971 7 10.227 7 9.30917C7 8.39138 7.74405 7.64733 8.66184 7.64733C9.57963 7.64733 10.3237 8.39138 10.3237 9.30917C10.3237 10.227 9.57963 10.971 8.66184 10.971ZM8.66184 4.32366C7.74405 4.32366 7 3.57962 7 2.66183C7 1.74404 7.74405 0.99999 8.66184 0.99999C9.57963 0.99999 10.3237 1.74404 10.3237 2.66183C10.3237 3.57962 9.57963 4.32366 8.66184 4.32366Z" fill="currentColor"/>
+            </svg>
+        </button>
+    </div>
+
+    <div id="bottomSheetOverlay"></div>
+    <div id="bottomSheet">
+        <div class="bottom-sheet-header">
+            <span>播放器设置</span>
+            <button class="bottom-sheet-close" aria-label="关闭设置">&times;</button>
+        </div>
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-section">
+                <h3>常规操作</h3>
+                <button id="bs_downloadDekButton" class="action" disabled>下载更新的DEK</button>
+                 <select id="bs_sortOrder">
+                    <option value="asc">文件名升序</option>
+                    <option value="desc">文件名降序</option>
+                </select>
+                <button id="bs_deleteCurrentDekButton" class="danger" disabled>删除当前DEK</button>
+            </div>
+            <div class="bottom-sheet-section">
+                <h3>播放控制</h3>
+                <select id="bs_repeatCount">
+                    <option value="1">重复1次</option> <option value="2">重复2次</option> <option value="3">重复3次</option>
+                </select>
+                 <select id="bs_playbackSpeed">
+                    <option value="1">速度1x</option> <option value="0.9">速度0.9x</option> <option value="0.8">速度0.8x</option>
+                </select>
+                <select id="bs_playMode">
+                    <option value="manual">手动播放</option> <option value="auto">自动连播</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" style="display: none;"></audio>
+
+    <script>
+        // --- DOM Elements ---
+        const sidebar = document.getElementById('sidebar');
+        const dekListSidebar = document.getElementById('dekListSidebar');
+        const dekFileUploadInputSidebar = document.getElementById('dekFileUploadInputSidebar');
+        const hamburgerButton = document.getElementById('hamburgerButton');
+        const mainContent = document.getElementById('main-content');
+        const mainContentWrapper = document.getElementById('main-content-wrapper');
+        const audioList = document.getElementById('audioList');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const statusMessage = document.getElementById('status-message');
+        const currentDekTitleElement = document.getElementById('currentDekTitle');
+        const headerPlaybackInfoElement = document.getElementById('headerPlaybackInfo');
+        const fab_toggleVisibility = document.getElementById('fab_toggleVisibility');
+        const fab_playPauseButton = document.getElementById('fab_playPauseButton');
+        const settingsButton = document.getElementById('settingsButton');
+        const bottomSheet = document.getElementById('bottomSheet');
+        const bottomSheetOverlay = document.getElementById('bottomSheetOverlay');
+        const bottomSheetCloseButton = bottomSheet.querySelector('.bottom-sheet-close');
+        const bs_downloadDekButton = document.getElementById('bs_downloadDekButton');
+        const bs_sortOrder = document.getElementById('bs_sortOrder');
+        const bs_deleteCurrentDekButton = document.getElementById('bs_deleteCurrentDekButton');
+        const bs_repeatCount = document.getElementById('bs_repeatCount');
+        const bs_playbackSpeed = document.getElementById('bs_playbackSpeed');
+        const bs_playMode = document.getElementById('bs_playMode');
+        const themeButtonLight = document.getElementById('theme-button-light');
+        const themeButtonDark = document.getElementById('theme-button-dark');
+
+        // --- SVG Icon Definitions ---
+        const svgIconPlay = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 2.25195C3 1.27741 4.06571 0.677697 4.89871 1.18347L15.3459 7.52636C16.1476 8.01311 16.1476 9.17661 15.3459 9.66336L4.89871 16.0062C4.06571 16.512 3 15.9123 3 14.9378V2.25195Z" fill="currentColor"/></svg>`;
+        const svgIconPause = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.35875 16.34H6.68806C7.57686 16.34 8.04682 15.9069 8.04682 15.0782V2.25244C8.04682 1.39551 7.57686 1 6.68806 1H4.35875C3.46995 1 3 1.43318 3 2.25244V15.0782C3 15.9069 3.46995 16.34 4.35875 16.34ZM11.7859 16.34H14.105C15.004 16.34 15.4638 15.9069 15.4638 15.0782V2.25244C15.4638 1.39551 15.004 1 14.105 1H11.7859C10.8869 1 10.417 1.43318 10.417 2.25244V15.0782C10.417 15.9069 10.8869 16.34 11.7859 16.34Z" fill="currentColor"/></svg>`;
+        const svgIconShow = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_44_show)"><g filter="url(#filter0_d_51_44_show)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 2C5.27071 2 2.00139 3.96023 0.170541 6.90366C-0.0568469 7.26922 -0.056847 7.73078 0.170541 8.09634C2.00139 11.0398 5.27071 13 9 13C12.7293 13 15.9986 11.0398 17.8295 8.09634C18.0568 7.73078 18.0568 7.26922 17.8295 6.90366C15.9986 3.96023 12.7293 2 9 2ZM8.91128 11.7059C11.0616 11.7059 12.8047 9.96769 12.8047 7.82353C12.8047 5.67937 11.0616 3.94118 8.91128 3.94118C6.761 3.94118 5.01784 5.67937 5.01784 7.82353C5.01784 9.96769 6.761 11.7059 8.91128 11.7059Z" fill="currentColor"/><path d="M10.2091 7.82353C10.2091 8.53825 9.62804 9.11765 8.91128 9.11765C8.19452 9.11765 7.61347 8.53825 7.61347 7.82353C7.61347 7.10881 8.19452 6.52941 8.91128 6.52941C9.62804 6.52941 10.2091 7.10881 10.2091 7.82353Z" fill="currentColor"/></g></g><defs><filter id="filter0_d_51_44_show" x="-2.4" y="0.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_44"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_44" result="shape"/></filter><clipPath id="clip0_51_44_show"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+        const svgIconHide = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.54735 2.30933C4.08639 1.84739 4.89771 1.91005 5.35985 2.44898L6.30028 3.54664C7.16097 3.31273 8.06562 3.18728 8.9995 3.18726C12.7288 3.18728 15.9987 5.17338 17.8296 8.15504C18.0565 8.52522 18.0568 8.993 17.8296 9.36305C16.948 10.7987 15.7311 12.0009 14.2915 12.864L15.2183 13.9451C15.6803 14.484 15.6182 15.2953 15.0796 15.7576C14.5405 16.2198 13.7283 16.1579 13.2661 15.6189L3.40771 4.12281C2.94548 3.58377 3.00832 2.77156 3.54735 2.30933ZM5.34032 7.51832C5.13329 7.99875 5.01708 8.52926 5.01708 9.08668C5.01742 11.2583 6.76068 13.0191 8.91063 13.0193C9.26589 13.0193 9.61 12.9697 9.937 12.8796L11.0122 14.1326C10.3611 14.2618 9.68811 14.3298 8.9995 14.3298C5.2705 14.3298 2.00131 12.3443 0.170401 9.36305C-0.056894 8.99288 -0.0567063 8.52528 0.170401 8.15504C0.941078 6.89994 1.96685 5.82125 3.17431 4.99293L5.34032 7.51832ZM8.91063 5.15406C8.53009 5.15409 8.16251 5.20944 7.81493 5.31226L12.4497 10.7166C12.6749 10.2197 12.8041 9.66893 12.8042 9.08668C12.8042 6.91467 11.0609 5.15408 8.91063 5.15406Z" fill="currentColor"/></svg>`;
+
+
+        // --- Global State, IndexedDB, Utility Functions ---
+        let currentDekName = null; let currentDekItems = []; let currentPlaylistIndex = -1;
+        let currentRepeatCount = 0; let isHiding = false; let currentDekZipBuffer = null;
+        const STORAGE_KNOWN_DEKS = 'dekPlayer_knownDeks';
+        const STORAGE_DEK_DATA_PREFIX = 'dekPlayer_data_';
+        const STORAGE_APP_THEME = 'dekPlayer_appTheme';
+        const STATUS_FILENAME_IN_ZIP = 'checked_status.json';
+        const DB_NAME = 'DekPlayerDB'; const DB_VERSION = 1; const AUDIO_STORE_NAME = 'audioFiles'; let db;
+        
+        function initDB() { return new Promise((resolve, reject) => { if (db) { resolve(db); return; } const request = indexedDB.open(DB_NAME, DB_VERSION); request.onerror = (event) => { console.error("IndexedDB error:", event.target.error); reject("IndexedDB error: " + event.target.error); }; request.onsuccess = (event) => { db = event.target.result; console.log("IndexedDB opened successfully."); resolve(db); }; request.onupgradeneeded = (event) => { const tempDb = event.target.result; if (!tempDb.objectStoreNames.contains(AUDIO_STORE_NAME)) { tempDb.createObjectStore(AUDIO_STORE_NAME, { keyPath: 'id' }); console.log(`Object store "${AUDIO_STORE_NAME}" created.`); }}; });}
+        async function saveAudioToDB(dekName, originalPath, audioData) { if (!db) await initDB(); if (!dekName || !originalPath || !audioData) { console.error("saveAudioToDB: Missing parameters."); return Promise.reject("Missing parameters"); } const id = `${dekName}::${originalPath}`; return new Promise((resolve, reject) => { const transaction = db.transaction([AUDIO_STORE_NAME], 'readwrite'); const store = transaction.objectStore(AUDIO_STORE_NAME); const request = store.put({ id: id, data: audioData }); request.onsuccess = () => resolve(); request.onerror = (event) => { console.error("Error saving audio to DB:", event.target.error); reject(event.target.error); }; });}
+        async function getAudioFromDB(dekName, originalPath) { if (!db) await initDB(); if (!dekName || !originalPath) { console.error("getAudioFromDB: Missing parameters."); return Promise.resolve(null); } const id = `${dekName}::${originalPath}`; return new Promise((resolve, reject) => { const transaction = db.transaction([AUDIO_STORE_NAME], 'readonly'); const store = transaction.objectStore(AUDIO_STORE_NAME); const request = store.get(id); request.onsuccess = (event) => { resolve(event.target.result ? event.target.result.data : null); }; request.onerror = (event) => { console.error("Error getting audio from DB:", event.target.error); reject(event.target.error); }; });}
+        async function clearAudioDataForDek(dekNameToClear) { if (!db) await initDB(); if (!dekNameToClear) return Promise.resolve(); return new Promise((resolve, reject) => { const transaction = db.transaction([AUDIO_STORE_NAME], 'readwrite'); const store = transaction.objectStore(AUDIO_STORE_NAME); const request = store.openCursor(); let itemsDeleted = 0; request.onsuccess = (event) => { const cursor = event.target.result; if (cursor) { if (cursor.key.startsWith(dekNameToClear + "::")) { store.delete(cursor.key); itemsDeleted++; } cursor.continue(); } else { console.log(`Deleted ${itemsDeleted} audio entries for DEK: ${dekNameToClear}`); resolve(); } }; request.onerror = (event) => { console.error(`Error clearing audio data for ${dekNameToClear}:`, event.target.error); reject(event.target.error); }; });}
+        function stripDekExtension(filename) { if (filename && typeof filename === 'string' && filename.toLowerCase().endsWith('.dek')) { return filename.substring(0, filename.length - 4); } return filename; }
+        function decodeFileName(filename) { return filename ? decodeURIComponent(stripDekExtension(filename)).replace(/\+/g, ' ') : "播放器"; }
+        function processText(text) { if (typeof text !== 'string') return ""; return text.trim().replace(/[（(]([^）)]+)[）)]/g, '<span class="highlight">$1</span>');}
+        function sortCurrentDekItems() { if (!currentDekItems || currentDekItems.length === 0) return; const sortOrder = bs_sortOrder.value; currentDekItems.sort((a, b) => { const nameA = a.audioName || a.name || ""; const nameB = b.audioName || b.name || ""; return sortOrder === 'asc' ? nameA.localeCompare(nameB, 'zh-Hans-CN-pinyin') : nameB.localeCompare(nameA, 'zh-Hans-CN-pinyin'); });}
+
+        // --- Theme Switcher Logic ---
+        function applyAppTheme(theme) {
+            if (theme === 'dark') {
+                sidebar.classList.add('sidebar-dark-theme');
+                document.body.classList.add('page-dark-theme');
+                themeButtonDark.classList.add('active');
+                themeButtonLight.classList.remove('active');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#121212');
+            } else { 
+                sidebar.classList.remove('sidebar-dark-theme');
+                document.body.classList.remove('page-dark-theme');
+                themeButtonLight.classList.add('active');
+                themeButtonDark.classList.remove('active');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#FFFFFF');
+            }
+            localStorage.setItem(STORAGE_APP_THEME, theme);
+        }
+
+        themeButtonLight.addEventListener('click', () => applyAppTheme('light'));
+        themeButtonDark.addEventListener('click', () => applyAppTheme('dark'));
+
+        // --- Initialization ---
+        window.addEventListener('load', async () => {
+            fab_playPauseButton.innerHTML = svgIconPlay;
+            fab_toggleVisibility.innerHTML = svgIconShow;
+
+            const savedTheme = localStorage.getItem(STORAGE_APP_THEME) || 'light';
+            applyAppTheme(savedTheme);
+            try { await initDB(); populateDekSidebarList(); const lastOpened = localStorage.getItem('dekPlayer_lastOpenedDek'); const knownDeks = getKnownDekNames();
+                if (lastOpened && knownDeks.includes(lastOpened)) { await loadDekDataFromStorage(lastOpened); }
+                else { resetPlayerState(true); }
+            } catch (error) { showStatus("数据库初始化失败。", "error", 0); console.error("DB Init failed on load:", error); resetPlayerState(true); }
+            updateButtonStatesAll(); updateDekTitle(); updatePlaybackInfoAll();
+        });
+
+        // --- Event Listeners ---
+        hamburgerButton.addEventListener('click', () => { sidebar.classList.toggle('open');});
+        mainContentWrapper.addEventListener('click', (event) => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && event.target !== hamburgerButton) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        dekFileUploadInputSidebar.addEventListener('change', (event) => { const file=event.target.files[0]; if(file){ if(!file.name.toLowerCase().endsWith('.dek')){showStatus('文件类型错误!','error'); dekFileUploadInputSidebar.value=''; return;} const newDekName=file.name; processUploadedDekFile(file,newDekName);}});
+        settingsButton.addEventListener('click', () => { bottomSheet.classList.add('visible'); bottomSheetOverlay.classList.add('visible'); });
+        bottomSheetCloseButton.addEventListener('click', closeBottomSheet);
+        bottomSheetOverlay.addEventListener('click', closeBottomSheet);
+        function closeBottomSheet() { bottomSheet.classList.remove('visible'); bottomSheetOverlay.classList.remove('visible'); }
+        
+        fab_toggleVisibility.addEventListener('click', () => { 
+            isHiding = !isHiding; 
+            fab_toggleVisibility.innerHTML = isHiding ? svgIconHide : svgIconShow; 
+            updateListVisibility(); 
+        });
+        fab_playPauseButton.addEventListener('click', togglePlayPause);
+
+        bs_sortOrder.addEventListener('change', () => { if(currentDekItems.length>0){sortCurrentDekItems(); populateAudioList(); saveCurrentDekMetadataToStorage();} });
+        bs_downloadDekButton.addEventListener('click', downloadUpdatedDek);
+        bs_deleteCurrentDekButton.addEventListener('click', handleDeleteCurrentDek);
+        bs_playbackSpeed.addEventListener('change', () => { if(audioPlayer.src)audioPlayer.playbackRate=parseFloat(bs_playbackSpeed.value);});
+
+        // --- DEK Deletion ---
+        async function handleDeleteCurrentDek() {
+            if (!currentDekName) { showStatus("没有选中的DEK可删除。", "info"); return; }
+            const confirmDelete = window.confirm(`确定要删除DEK "${decodeFileName(currentDekName)}" 吗？此操作无法撤销。`);
+            if (confirmDelete) { showStatus(`正在删除 ${decodeFileName(currentDekName)}...`, "info", 0); try { await clearAudioDataForDek(currentDekName); localStorage.removeItem(STORAGE_DEK_DATA_PREFIX + currentDekName); let knownDeks = getKnownDekNames(); const indexToRemove = knownDeks.indexOf(currentDekName); if (indexToRemove > -1) { knownDeks.splice(indexToRemove, 1); saveKnownDekNames(knownDeks); } if (localStorage.getItem('dekPlayer_lastOpenedDek') === currentDekName) { localStorage.removeItem('dekPlayer_lastOpenedDek'); } showStatus(`"${decodeFileName(currentDekName)}" 已成功删除。`, "success"); const dekNameToSelectAfterDelete = knownDeks.length > 0 ? knownDeks[0] : null; resetPlayerState(true); populateDekSidebarList(); if (dekNameToSelectAfterDelete) { await loadDekDataFromStorage(dekNameToSelectAfterDelete); } } catch (error) { console.error("删除DEK时出错:", error); showStatus(`删除 "${decodeFileName(currentDekName)}" 失败: ${error.message}`, "error"); } finally { closeBottomSheet(); } }
+        }
+
+        // --- DEK Processing & Storage Functions ---
+        function getKnownDekNames() { const names=JSON.parse(localStorage.getItem(STORAGE_KNOWN_DEKS))||[]; return names.filter(name=>name&&typeof name==='string');}
+        function saveKnownDekNames(names) { localStorage.setItem(STORAGE_KNOWN_DEKS,JSON.stringify(names.filter(name=>name&&typeof name==='string')) );}
+        function addKnownDekName(name) { if(!name||typeof name!=='string')return; let names=getKnownDekNames(); if(!names.includes(name)){names.push(name);saveKnownDekNames(names);}}
+        function populateDekSidebarList() { const knownDeks=getKnownDekNames(); dekListSidebar.innerHTML=''; if(knownDeks.length===0){const li=document.createElement('li');li.textContent="没有已加载的DEK";li.style.fontStyle="italic";li.style.opacity="0.7";dekListSidebar.appendChild(li);updateDekTitle();updatePlaybackInfoAll();return;} knownDeks.forEach(name=>{const li=document.createElement('li');li.textContent=decodeFileName(name);li.dataset.dekName=name;if(name===currentDekName){li.classList.add('active-dek');} li.addEventListener('click',async()=>{await loadDekDataFromStorage(name); if(window.innerWidth<=768){sidebar.classList.remove('open');}}); dekListSidebar.appendChild(li);});}
+        function setActiveDekInSidebar(dekName) { const items=dekListSidebar.getElementsByTagName('li');for(let item of items){if(item.dataset.dekName===dekName){item.classList.add('active-dek');}else{item.classList.remove('active-dek');}}}
+        async function processUploadedDekFile(file, newDekName) {
+            showStatus(`正在处理 ${newDekName}...`, 'info', 0);
+            if (currentDekName && currentDekName !== newDekName) { try { await clearAudioDataForDek(currentDekName); } catch (clearError) { console.warn("Clearing old DEK audio data failed:", clearError); } }
+            resetPlayerState(false); currentDekName = newDekName; updateDekTitle();
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try { currentDekZipBuffer = e.target.result; const zip = await JSZip.loadAsync(currentDekZipBuffer); let tempItems = []; let zipCheckedStatus = {};
+                    const statusFileEntry = zip.file(STATUS_FILENAME_IN_ZIP); if (statusFileEntry) { try { const sc = await statusFileEntry.async("string"); zipCheckedStatus = JSON.parse(sc); } catch (err) { console.warn("解析ZIP内状态文件失败:", err); }}
+                    const fileProcessingPromises = [];
+                    zip.forEach((relativePath, zipEntry) => { if (zipEntry.dir || relativePath.startsWith('__MACOSX/') || zipEntry.name.startsWith('._') || zipEntry.name.endsWith('.DS_Store')) { return; } const fileName = zipEntry.name.split('/').pop(); const baseNameForStatus = fileName.substring(0, fileName.lastIndexOf('.')); const isCheckedFromZip = zipCheckedStatus[baseNameForStatus] === true; if (fileName.toLowerCase().endsWith('.mp3')) { fileProcessingPromises.push( zipEntry.async('arraybuffer').then(async (audioData) => { try { await saveAudioToDB(currentDekName, zipEntry.name, audioData); } catch (dbError) { console.error(`Failed to save audio ${zipEntry.name} to DB:`, dbError); } tempItems.push({ name: fileName, type: 'audio', isChecked: isCheckedFromZip, originalPathInZip: zipEntry.name }); }) ); } else if (fileName.toLowerCase().endsWith('.txt')) { fileProcessingPromises.push( zipEntry.async('string').then(textContent => { tempItems.push({ name: fileName, type: 'text', textContent: textContent, isChecked: isCheckedFromZip, originalPathInZip: zipEntry.name }); }) ); } });
+                    await Promise.all(fileProcessingPromises);
+                    const groupedItems = {}; tempItems.forEach(item => { const baseName=item.name.substring(0,item.name.lastIndexOf('.')); if(!groupedItems[baseName]){groupedItems[baseName]={name:baseName,isChecked:item.isChecked,originalPaths:{}};} if(item.type==='audio'){groupedItems[baseName].originalPaths.audio=item.originalPathInZip;groupedItems[baseName].audioName=item.name;}else if(item.type==='text'){groupedItems[baseName].textContent=item.textContent;groupedItems[baseName].originalPaths.text=item.originalPathInZip;} if(item.isChecked)groupedItems[baseName].isChecked=true; });
+                    currentDekItems = Object.values(groupedItems).filter(item => item.originalPaths && item.originalPaths.audio && item.audioName);
+                    sortCurrentDekItems(); populateAudioList(); saveCurrentDekMetadataToStorage(); addKnownDekName(currentDekName); populateDekSidebarList(); setActiveDekInSidebar(currentDekName); localStorage.setItem('dekPlayer_lastOpenedDek', currentDekName);
+                    showStatus(`${decodeFileName(currentDekName)} 加载成功! 共 ${currentDekItems.length} 个可播放条目。`, 'success');
+                    if (window.innerWidth <= 768) { sidebar.classList.remove('open'); }
+                } catch (err) { console.error("处理DEK文件失败:", err); showStatus(`处理 ${decodeFileName(currentDekName)} 文件失败: ${err.message}`, 'error'); currentDekName=null; currentDekZipBuffer=null; updateDekTitle();}
+                finally { dekFileUploadInputSidebar.value=''; updateButtonStatesAll(); }
+            };
+            reader.onerror = () => { showStatus('读取文件时出错。','error');currentDekName=null;currentDekZipBuffer=null;updateButtonStatesAll();updateDekTitle();};
+            reader.readAsArrayBuffer(file);
+        }
+        async function loadDekDataFromStorage(dekNameToLoad) {
+            if (!dekNameToLoad || typeof dekNameToLoad !== 'string') { resetPlayerState(true); return; }
+            showStatus(`正在从浏览器加载 ${decodeFileName(dekNameToLoad)}...`, 'info'); resetPlayerState(false); currentDekName = dekNameToLoad; updateDekTitle(); currentDekZipBuffer = null; setActiveDekInSidebar(currentDekName);
+            const storedDataJSON = localStorage.getItem(STORAGE_DEK_DATA_PREFIX + dekNameToLoad);
+            if (!storedDataJSON) { showStatus(`在浏览器存储中未找到 ${decodeFileName(dekNameToLoad)} 的数据。`, 'error'); currentDekName=null;setActiveDekInSidebar(null);updateButtonStatesAll();updateDekTitle();return; }
+            try {
+                const storedData = JSON.parse(storedDataJSON);
+                if (storedData && storedData.files && storedData.dekName === dekNameToLoad) {
+                    currentDekItems = storedData.files.map(item => ({ ...item, blobUrl: null, textContent: item.textContent || ""}));
+                    currentDekItems = currentDekItems.filter(item => item.name && item.audioName && item.originalPaths && item.originalPaths.audio);
+                    sortCurrentDekItems(); populateAudioList(); localStorage.setItem('dekPlayer_lastOpenedDek', currentDekName);
+                    showStatus(`${decodeFileName(currentDekName)} 已从浏览器存储加载元数据。`, 'success');
+                } else { throw new Error("存储的数据格式不正确或DEK名称不匹配。"); }
+            } catch (e) { showStatus(`加载 ${decodeFileName(dekNameToLoad)} 的存储数据失败: ${e.message}`,'error');console.error("加载localStorage数据失败:",e);currentDekName=null;setActiveDekInSidebar(null);updateDekTitle();}
+            updateButtonStatesAll();
+        }
+        function saveCurrentDekMetadataToStorage() { if (!currentDekName || typeof currentDekName !== 'string') return; const dataToStore = { dekName: currentDekName, files: currentDekItems.map(item => { const { audioData, blobUrl, ...storableItem } = item; return storableItem; })}; try { localStorage.setItem(STORAGE_DEK_DATA_PREFIX + currentDekName, JSON.stringify(dataToStore)); console.log("已保存元数据到 localStorage: " + currentDekName); } catch (e) { console.error("保存元数据到localStorage失败:",e);showStatus("保存元数据到浏览器失败!","error");}}
+
+        // --- UI Population & Updates ---
+        function populateAudioList() { audioList.innerHTML='';if(!currentDekItems||currentDekItems.length===0){updatePlaybackInfoAll();if(currentDekName)showStatus(`DEK "${decodeFileName(currentDekName)}" 中没有可播放的项目。`,'info');else showStatus("请选择或上传一个DEK文件。", "info");updateButtonStatesAll();return;}currentDekItems.forEach((item,index)=>{const li=document.createElement('li');li.dataset.index=index;li.dataset.filename=item.audioName||item.name;const chkCont=document.createElement('div');chkCont.className='checkbox-container';const chk=document.createElement('input');chk.type='checkbox';chk.checked=item.isChecked||false;chk.addEventListener('change',()=>{currentDekItems[index].isChecked=chk.checked;updateListVisibility();saveCurrentDekMetadataToStorage();});chkCont.appendChild(chk);li.appendChild(chkCont);const numSpan=document.createElement('span');numSpan.className='file-number';numSpan.textContent=`${index+1}.`;li.appendChild(numSpan);const contSpan=document.createElement('span');contSpan.className='file-content';contSpan.innerHTML=item.textContent?processText(item.textContent):decodeFileName(item.audioName||item.name);li.appendChild(contSpan);li.addEventListener('click',(e)=>{if(e.target!==chk&&!chkCont.contains(e.target)){playAudio(index);}});audioList.appendChild(li);}); updateListVisibility();updatePlaybackInfoAll();updateButtonStatesAll();}
+        function updateListVisibility() { const items=audioList.getElementsByTagName('li');for(let i=0;i<items.length;i++){const itemEl=items[i];const dekIt=currentDekItems[i];if(dekIt){if(isHiding&&dekIt.isChecked){itemEl.classList.add('hidden');}else{itemEl.classList.remove('hidden');}}}}
+        function updateButtonStatesAll() { const hasDekLoadedAndItems=currentDekName&&currentDekItems.length>0;fab_playPauseButton.disabled=!hasDekLoadedAndItems;fab_toggleVisibility.disabled=!hasDekLoadedAndItems;bs_downloadDekButton.disabled=!currentDekZipBuffer;bs_sortOrder.disabled=!hasDekLoadedAndItems;bs_deleteCurrentDekButton.disabled=!currentDekName;bs_repeatCount.disabled=!hasDekLoadedAndItems;bs_playbackSpeed.disabled=!hasDekLoadedAndItems;bs_playMode.disabled=!hasDekLoadedAndItems;}
+        function resetPlayerState(fullReset = true) { 
+            audioPlayer.pause();audioPlayer.src=''; 
+            fab_playPauseButton.innerHTML = svgIconPlay;
+            currentDekItems.forEach(item=>{if(item.blobUrl)URL.revokeObjectURL(item.blobUrl);});currentDekItems=[];currentPlaylistIndex=-1;currentRepeatCount=0;audioList.innerHTML='';if(fullReset){currentDekName=null;currentDekZipBuffer=null;setActiveDekInSidebar(null);showStatus("播放器已重置。","info");}updateDekTitle();updatePlaybackInfoAll();updateButtonStatesAll();
+        }
+        let statusTimeout; function showStatus(message,type='info',duration=4000){clearTimeout(statusTimeout);statusMessage.textContent=message;statusMessage.className=type;if(duration>0){statusTimeout=setTimeout(()=>{statusMessage.textContent='';statusMessage.className='';},duration);}}
+        function updateDekTitle() { currentDekTitleElement.textContent = currentDekName ? decodeFileName(currentDekName) : "播放器"; }
+        function updatePlaybackInfoAll() { const text = currentDekItems.length > 0 && currentPlaylistIndex >= 0 && currentPlaylistIndex < currentDekItems.length ? `${currentPlaylistIndex + 1} / ${currentDekItems.length}` : '--/--'; headerPlaybackInfoElement.textContent = text; }
+
+        // --- Playback Logic ---
+        async function playAudio(index) { 
+            if(index<0||index>=currentDekItems.length)return;
+            const item=currentDekItems[index];
+            if(!item){showStatus("无法找到选定的播放条目。","error");return;} 
+            if(item.blobUrl){URL.revokeObjectURL(item.blobUrl);item.blobUrl=null;} 
+            if(!item.originalPaths||!item.originalPaths.audio){showStatus(`播放 "${item.audioName||item.name}" 失败: 缺少音频路径。`,'error',6000);return;} 
+            try{
+                const audioData=await getAudioFromDB(currentDekName,item.originalPaths.audio);
+                if(!audioData){showStatus(`播放 "${item.audioName||item.name}" 失败: 无法从DB获取音频。`,'error',6000);return;}
+                const blob=new Blob([audioData],{type:'audio/mpeg'});item.blobUrl=URL.createObjectURL(blob);
+            }catch(e){console.error("从IDB获取或创建Blob URL失败:",e);showStatus(`播放 "${item.audioName||item.name}" 失败: 音频数据错误。`,'error',6000);return;} 
+            
+            currentPlaylistIndex=index;currentRepeatCount=0;audioPlayer.src=item.blobUrl;audioPlayer.playbackRate=parseFloat(bs_playbackSpeed.value); 
+            audioPlayer.play().then(()=>{
+                fab_playPauseButton.innerHTML = svgIconPause;
+                highlightPlayingItem(item.audioName||item.name);updatePlaybackInfoAll();
+            }).catch(error=>{
+                console.error("播放音频错误:",error);showStatus(`播放 "${item.audioName||item.name}" 出错: ${error.message}`,"error");
+                fab_playPauseButton.innerHTML = svgIconPlay;
+            }); 
+            audioPlayer.onended=()=>{
+                currentRepeatCount++;
+                if(currentRepeatCount<parseInt(bs_repeatCount.value)){audioPlayer.play();}
+                else{
+                    if(bs_playMode.value==='auto'){
+                        const nextIdx=findNextVisiblePlayableItem(currentPlaylistIndex);
+                        if(nextIdx!==-1){playAudio(nextIdx);}
+                        else{fab_playPauseButton.innerHTML = svgIconPlay;showStatus("已到达播放列表末尾。","info");}
+                    } else {
+                        fab_playPauseButton.innerHTML = svgIconPlay;
+                    }
+                }
+            }; 
+        }
+        function findNextVisiblePlayableItem(currentIndex) { for(let i=currentIndex+1;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){return i;}} if(bs_playMode.value==='auto'&&currentDekItems.length>0){for(let i=0;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){if(i===currentIndex&&currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length<=1){if(currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length>1)continue;}else if(i===currentIndex){continue;}return i;}}}return-1;}
+        
+        function togglePlayPause() { 
+            if(!audioPlayer.src&&currentDekItems.length>0){
+                const firstPlayable=findNextVisiblePlayableItem(-1);
+                if(firstPlayable!==-1){playAudio(firstPlayable);}
+                else{showStatus("播放列表中没有可见的可播放条目。","info");}
+                return;
+            } 
+            if(audioPlayer.paused){
+                if(audioPlayer.src){
+                    audioPlayer.play().then(()=>{
+                        fab_playPauseButton.innerHTML = svgIconPause;
+                    }).catch(e=>{console.error("播放失败:",e);showStatus("无法播放音频。","error");});
+                } else if(currentDekItems.length>0){
+                    const firstPlayable=findNextVisiblePlayableItem(-1);
+                    if(firstPlayable!==-1)playAudio(firstPlayable);
+                    else showStatus("播放列表中没有可见的可播放条目。","info");
+                }
+            } else {
+                audioPlayer.pause();
+                fab_playPauseButton.innerHTML = svgIconPlay;
+            }
+        }
+        function highlightPlayingItem(filenameToHighlight) { const items=audioList.getElementsByTagName('li');for(let item of items){item.classList.remove('current-playing');if(item.dataset.filename===filenameToHighlight){item.classList.add('current-playing');item.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});}}}
+
+        // --- Download Updated DEK ---
+        async function downloadUpdatedDek() {
+            if (!currentDekName || !currentDekItems.length || !currentDekZipBuffer) {
+                showStatus("没有当前DEK或DEK内容无法下载。", "error"); return;
+            }
+            showStatus("正在准备下载...", "info", 0);
+            try {
+                const zip = await JSZip.loadAsync(currentDekZipBuffer);
+                const checkedStatus = {};
+                currentDekItems.forEach(item => {
+                    const baseName = (item.audioName || item.name).substring(0, (item.audioName || item.name).lastIndexOf('.'));
+                    if (item.isChecked) { checkedStatus[baseName] = true; }
+                });
+                zip.file(STATUS_FILENAME_IN_ZIP, JSON.stringify(checkedStatus, null, 2));
+
+                const updatedZipBlob = await zip.generateAsync({ type: "blob" });
+                const downloadUrl = URL.createObjectURL(updatedZipBlob);
+                const a = document.createElement("a");
+                a.href = downloadUrl;
+                a.download = currentDekName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(downloadUrl);
+                showStatus("DEK已开始下载！", "success");
+            } catch (error) {
+                console.error("下载更新的DEK失败:", error);
+                showStatus(`下载失败: ${error.message}`, "error");
+            } finally { closeBottomSheet(); }
+        }
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(registration => console.log('Service Worker registered with scope:', registration.scope))
+            .catch(error => console.log('Service Worker registration failed:', error));
+        }
+    </script>
+</body>
+</html>
