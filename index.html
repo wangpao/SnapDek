@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"> <!-- Added viewport-fit=cover -->
     <title>Dek Player</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,8 +49,8 @@
             --fab-actual-bg-color: #333333;
             --fab-actual-icon-color: #FFFFFF;
             --fab-hover-opacity: 0.85;
-            --fab-size: 48px; /* Adjusted size */
-            --fab-icon-size: 20px; /* Adjusted icon size */
+            --fab-size: 48px; 
+            --fab-icon-size: 20px;
         }
 
         body.page-dark-theme {
@@ -84,7 +84,10 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
-            margin: 0; padding: 0; display: flex; min-height: 100vh;
+            margin: 0; 
+            padding: 0; /* Ensure no default body padding interferes */
+            display: flex; 
+            min-height: 100vh;
             overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
@@ -93,20 +96,30 @@
             width: var(--sidebar-width);
             background-color: var(--sidebar-actual-bg);
             color: var(--sidebar-actual-text);
-            padding: 8px;
+            
+            padding-top: 8px;
+            padding-right: 8px;
+            padding-left: 8px;
+            /* Adjusted padding-bottom to respect safe area */
+            padding-bottom: calc(8px + env(safe-area-inset-bottom, 20px)); 
+            
             box-sizing: border-box;
-            height: 100vh;
+            height: 100vh; /* Full viewport height */
             position: fixed;
             left: 0;
             top: 0;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            overflow-y: auto; /* Allows sidebar itself to scroll if content + switcher is too tall */
             transition: transform 0.3s ease-in-out, background-color 0.3s, color 0.3s, border-color 0.3s;
             z-index: 200;
             border-right: 1px solid var(--sidebar-actual-border-color);
         }
-        #sidebar-scrollable-content { flex-grow: 1; overflow-y: auto; }
+        #sidebar-scrollable-content { 
+            flex-grow: 1; 
+            overflow-y: auto; /* This part scrolls if its content is long */
+            /* padding-bottom: 8px; Add some space before the switcher if needed, but the parent's padding-bottom should handle the safe area */
+        }
         
         #sidebar-logo-container {
             padding: 10px 8px;
@@ -126,15 +139,24 @@
         #dekListSidebar li { padding: 8px 12px; cursor: pointer; border-radius: 6px; margin-bottom: 3px; transition: background-color .15s ease-out, color .15s ease-out; font-size: 0.875em; color: var(--sidebar-actual-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #dekListSidebar li:hover { background-color: var(--sidebar-actual-item-hover-bg); }
         #dekListSidebar li.active-dek { background-color: var(--sidebar-actual-item-active-bg); font-weight: 500; }
-        #sidebar-theme-switcher { padding: 10px 8px; margin-top: auto; border-top: 1px solid var(--sidebar-actual-border-color); display: flex; gap: 8px; transition: border-color 0.3s; }
+        
+        #sidebar-theme-switcher { 
+            padding: 10px 8px; /* Padding within the switcher div */
+            margin-top: auto; /* Pushes to the bottom of the flex container */
+            border-top: 1px solid var(--sidebar-actual-border-color); 
+            display: flex; 
+            gap: 8px; 
+            transition: border-color 0.3s;
+            flex-shrink: 0; /* Prevent it from shrinking */
+        }
         .theme-button { flex: 1; background-color: transparent; color: var(--sidebar-actual-icon-color); border: 1px solid transparent; padding: 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
         .theme-button:hover { background-color: var(--sidebar-actual-icon-hover-bg); }
         .theme-button.active { background-color: var(--sidebar-actual-item-active-bg); border-color: var(--sidebar-actual-button-border); color: var(--sidebar-actual-text); }
         .theme-button svg { width: 18px; height: 18px; fill: currentColor; }
 
         #main-content { flex-grow: 1; margin-left: var(--sidebar-width); box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-color: var(--background-color); transition: background-color 0.3s; }
-        .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-bar-height); padding: 0 10px; box-sizing: border-box; width: 100%; background-color: var(--bottom-sheet-bg); border-bottom: 1px solid var(--sidebar-actual-border-color); z-index: 100; flex-shrink: 0; color: var(--text-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
-        #main-content-wrapper { max-width:800px; width: 100%; margin:0 auto; padding: 0 var(--main-content-padding) var(--main-content-padding); box-sizing: border-box; flex-grow: 1; overflow-y: auto; position: relative; }
+        .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-bar-height); padding: 0 10px; padding-left: env(safe-area-inset-left, 10px); padding-right: env(safe-area-inset-right, 10px); box-sizing: border-box; width: 100%; background-color: var(--bottom-sheet-bg); border-bottom: 1px solid var(--sidebar-actual-border-color); z-index: 100; flex-shrink: 0; color: var(--text-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
+        #main-content-wrapper { max-width:800px; width: 100%; margin:0 auto; padding: 0 var(--main-content-padding) calc(var(--main-content-padding) + env(safe-area-inset-bottom, 0px)); padding-left: calc(var(--main-content-padding) + env(safe-area-inset-left, 0px)); padding-right: calc(var(--main-content-padding) + env(safe-area-inset-right, 0px)); box-sizing: border-box; flex-grow: 1; overflow-y: auto; position: relative; }
         #hamburgerButton { display: none; background: transparent; border: none; color: var(--text-color); cursor: pointer; padding: 8px; margin-right: 8px; flex-shrink: 0; border-radius: 6px; transition: background-color 0.2s, color 0.3s; width: 36px; height: 36px; align-items: center; justify-content: center; }
         #hamburgerButton:hover { background-color: var(--item-hover-color); }
         #hamburgerButton svg { width: 20px; height: 20px; fill: currentColor; }
@@ -161,8 +183,8 @@
         /* Floating Action Buttons Area */
         .floating-action-buttons {
             position: fixed;
-            bottom: 30px; /* Adjusted position */
-            right: 20px;
+            bottom: calc(30px + env(safe-area-inset-bottom, 0px)); /* Adjusted for safe area */
+            right: calc(20px + env(safe-area-inset-right, 0px)); /* Adjusted for safe area */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -206,7 +228,7 @@
         /* Bottom Sheet (Settings Menu) */
         #bottomSheetOverlay { position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.4);z-index:1000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s; }
         #bottomSheetOverlay.visible { opacity:1;visibility:visible;transition:opacity .3s ease,visibility 0s linear 0s; }
-        #bottomSheet { position:fixed;bottom:0;left:0;right:0;background-color:var(--bottom-sheet-bg);border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -2px 10px rgba(0,0,0,.15);padding-bottom:env(safe-area-inset-bottom,15px);max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease-in-out, background-color 0.3s;z-index:1002; }
+        #bottomSheet { position:fixed;bottom:0;left:0;right:0;background-color:var(--bottom-sheet-bg);border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -2px 10px rgba(0,0,0,.15); padding-bottom:env(safe-area-inset-bottom,15px); max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease-in-out, background-color 0.3s;z-index:1002; }
         #bottomSheet.visible { transform:translateY(0); }
         .bottom-sheet-header { padding:15px 20px;font-size:1.1em;font-weight:700;color:var(--text-color);border-bottom:1px solid var(--sidebar-actual-border-color);background-color:var(--bottom-sheet-header-bg);border-top-left-radius:16px;border-top-right-radius:16px;display:flex;justify-content:space-between;align-items:center; transition: background-color 0.3s, border-color 0.3s, color 0.3s;}
         .bottom-sheet-close { background:0 0;border:none;font-size:1.5em;color:var(--text-color);cursor:pointer;padding:5px;line-height:1;margin:0;width:auto; transition: color 0.3s;}
@@ -236,8 +258,8 @@
             .bottom-sheet-content { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
         }
         @media (max-width: 480px) {
-            .fab-button { width: 44px; height: 44px; } /* Adjusted for mobile */
-            .fab-button svg { width: 18px; height: 18px; } /* Adjusted for mobile */
+            .fab-button { width: 44px; height: 44px; } 
+            .fab-button svg { width: 18px; height: 18px; }
             #bottomSheet { max-height: 85vh; }
             #currentDekTitle { font-size: 0.9em; }
             #headerPlaybackInfo { font-size: 0.8em; padding: 1px 4px; }
@@ -301,7 +323,7 @@
     <div id="bottomSheet">
         <div class="bottom-sheet-header">
             <span>播放器设置</span>
-            <button class="bottom-sheet-close" aria-label="关闭设置">&times;</button>
+            <button class="bottom-sheet-close" aria-label="关闭设置">×</button>
         </div>
         <div class="bottom-sheet-content">
             <div class="bottom-sheet-section">
@@ -501,7 +523,7 @@
         // --- UI Population & Updates ---
         function populateAudioList() { audioList.innerHTML='';if(!currentDekItems||currentDekItems.length===0){updatePlaybackInfoAll();if(currentDekName)showStatus(`DEK "${decodeFileName(currentDekName)}" 中没有可播放的项目。`,'info');else showStatus("请选择或上传一个DEK文件。", "info");updateButtonStatesAll();return;}currentDekItems.forEach((item,index)=>{const li=document.createElement('li');li.dataset.index=index;li.dataset.filename=item.audioName||item.name;const chkCont=document.createElement('div');chkCont.className='checkbox-container';const chk=document.createElement('input');chk.type='checkbox';chk.checked=item.isChecked||false;chk.addEventListener('change',()=>{currentDekItems[index].isChecked=chk.checked;updateListVisibility();saveCurrentDekMetadataToStorage();});chkCont.appendChild(chk);li.appendChild(chkCont);const numSpan=document.createElement('span');numSpan.className='file-number';numSpan.textContent=`${index+1}.`;li.appendChild(numSpan);const contSpan=document.createElement('span');contSpan.className='file-content';contSpan.innerHTML=item.textContent?processText(item.textContent):decodeFileName(item.audioName||item.name);li.appendChild(contSpan);li.addEventListener('click',(e)=>{if(e.target!==chk&&!chkCont.contains(e.target)){playAudio(index);}});audioList.appendChild(li);}); updateListVisibility();updatePlaybackInfoAll();updateButtonStatesAll();}
         function updateListVisibility() { const items=audioList.getElementsByTagName('li');for(let i=0;i<items.length;i++){const itemEl=items[i];const dekIt=currentDekItems[i];if(dekIt){if(isHiding&&dekIt.isChecked){itemEl.classList.add('hidden');}else{itemEl.classList.remove('hidden');}}}}
-        function updateButtonStatesAll() { const hasDekLoadedAndItems=currentDekName&&currentDekItems.length>0;fab_playPauseButton.disabled=!hasDekLoadedAndItems;fab_toggleVisibility.disabled=!hasDekLoadedAndItems;bs_downloadDekButton.disabled=!currentDekZipBuffer;bs_sortOrder.disabled=!hasDekLoadedAndItems;bs_deleteCurrentDekButton.disabled=!currentDekName;bs_repeatCount.disabled=!hasDekLoadedAndItems;bs_playbackSpeed.disabled=!hasDekLoadedAndItems;bs_playMode.disabled=!hasDekLoadedAndItems;}
+        function updateButtonStatesAll() { const hasDekLoadedAndItems=currentDekName&¤tDekItems.length>0;fab_playPauseButton.disabled=!hasDekLoadedAndItems;fab_toggleVisibility.disabled=!hasDekLoadedAndItems;bs_downloadDekButton.disabled=!currentDekZipBuffer;bs_sortOrder.disabled=!hasDekLoadedAndItems;bs_deleteCurrentDekButton.disabled=!currentDekName;bs_repeatCount.disabled=!hasDekLoadedAndItems;bs_playbackSpeed.disabled=!hasDekLoadedAndItems;bs_playMode.disabled=!hasDekLoadedAndItems;}
         function resetPlayerState(fullReset = true) { 
             audioPlayer.pause();audioPlayer.src=''; 
             fab_playPauseButton.innerHTML = svgIconPlay;
@@ -546,10 +568,10 @@
                 }
             }; 
         }
-        function findNextVisiblePlayableItem(currentIndex) { for(let i=currentIndex+1;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){return i;}} if(bs_playMode.value==='auto'&&currentDekItems.length>0){for(let i=0;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){if(i===currentIndex&&currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length<=1){if(currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length>1)continue;}else if(i===currentIndex){continue;}return i;}}}return-1;}
+        function findNextVisiblePlayableItem(currentIndex) { for(let i=currentIndex+1;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){return i;}} if(bs_playMode.value==='auto'&¤tDekItems.length>0){for(let i=0;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){if(i===currentIndex&¤tDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length<=1){if(currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length>1)continue;}else if(i===currentIndex){continue;}return i;}}}return-1;}
         
         function togglePlayPause() { 
-            if(!audioPlayer.src&&currentDekItems.length>0){
+            if(!audioPlayer.src&¤tDekItems.length>0){
                 const firstPlayable=findNextVisiblePlayableItem(-1);
                 if(firstPlayable!==-1){playAudio(firstPlayable);}
                 else{showStatus("播放列表中没有可见的可播放条目。","info");}
