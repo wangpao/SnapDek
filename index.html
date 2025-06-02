@@ -237,11 +237,15 @@
         }
         @media (max-width: 480px) {
             .floating-action-buttons {
-                bottom: 25px; /* Slightly raised for mobile */
+                bottom: 30px; /* Move FABs up slightly on small screens */
             }
             .fab-button {
-                --fab-size: 48px; /* Larger FAB on mobile */
-                --fab-icon-size: 20px; /* Larger icon for larger FAB */
+                width: 48px;  /* Increase button size */
+                height: 48px;
+            }
+             .fab-button svg {
+                width: 20px;  /* Increase icon size */
+                height: 20px;
             }
             #bottomSheet { max-height: 85vh; }
             #currentDekTitle { font-size: 0.9em; }
@@ -255,6 +259,7 @@
         <div id="sidebar-scrollable-content">
             <div id="sidebar-logo-container">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- <rect width="24" height="24" fill="white"/> Removed for transparent background -->
                     <rect x="5" y="7.24963" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 7.24963)" fill="#FF4900"/>
                     <rect x="5" y="13.572" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 13.572)" fill="#FFBC00"/>
                     <rect x="5" y="19.8439" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 19.8439)" fill="#F5EC00"/>
@@ -306,7 +311,7 @@
     <div id="bottomSheet">
         <div class="bottom-sheet-header">
             <span>播放器设置</span>
-            <button class="bottom-sheet-close" aria-label="关闭设置">×</button>
+            <button class="bottom-sheet-close" aria-label="关闭设置">&times;</button>
         </div>
         <div class="bottom-sheet-content">
             <div class="bottom-sheet-section">
@@ -364,10 +369,10 @@
         const themeButtonDark = document.getElementById('theme-button-dark');
 
         // --- SVG Icon Definitions ---
-        const svgIconPlay = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 2.25195C4 1.27741 5.06571 0.677697 5.89871 1.18347L16.3459 7.52636C17.1476 8.01311 17.1476 9.17661 16.3459 9.66336L5.89871 16.0062C5.06571 16.512 4 15.9123 4 14.9378V2.25195Z" fill="currentColor"/></svg>`;
+        const svgIconPlay_new = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 2.25195C4 1.27741 5.06571 0.677697 5.89871 1.18347L16.3459 7.52636C17.1476 8.01311 17.1476 9.17661 16.3459 9.66336L5.89871 16.0062C5.06571 16.512 4 15.9123 4 14.9378V2.25195Z" fill="currentColor"/></svg>`;
         const svgIconPause = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.35875 16.34H6.68806C7.57686 16.34 8.04682 15.9069 8.04682 15.0782V2.25244C8.04682 1.39551 7.57686 1 6.68806 1H4.35875C3.46995 1 3 1.43318 3 2.25244V15.0782C3 15.9069 3.46995 16.34 4.35875 16.34ZM11.7859 16.34H14.105C15.004 16.34 15.4638 15.9069 15.4638 15.0782V2.25244C15.4638 1.39551 15.004 1 14.105 1H11.7859C10.8869 1 10.417 1.43318 10.417 2.25244V15.0782C10.417 15.9069 10.8869 16.34 11.7859 16.34Z" fill="currentColor"/></svg>`;
-        const svgIconShow = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_44_show_fab)"><g filter="url(#filter0_d_51_44_show_fab)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g></g><defs><filter id="filter0_d_51_44_show_fab" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_44"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_44" result="shape"/></filter><clipPath id="clip0_51_44_show_fab"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
-        const svgIconHide = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_63_hide_fab)"><g filter="url(#filter0_d_51_63_hide_fab)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g><path d="M1.95314 3.25842C2.47545 2.61317 3.42194 2.5135 4.06719 3.03581L14.884 11.7916C15.5292 12.3139 15.6289 13.2604 15.1066 13.9057V13.9057C14.5843 14.5509 13.6378 14.6506 12.9925 14.1283L2.17575 5.37247C1.5305 4.85016 1.43083 3.90367 1.95314 3.25842V3.25842Z" fill="currentColor"/></g><defs><filter id="filter0_d_51_63_hide_fab" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_63"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_63" result="shape"/></filter><clipPath id="clip0_51_63_hide_fab"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+        const svgIconShow_new = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_44_new_show)"><g filter="url(#filter0_d_51_44_new_show)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g></g><defs><filter id="filter0_d_51_44_new_show" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_44"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_44" result="shape"/></filter><clipPath id="clip0_51_44_new_show"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+        const svgIconHide_new = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_63_new_hide)"><g filter="url(#filter0_d_51_63_new_hide)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g><path d="M1.95314 3.25842C2.47545 2.61317 3.42194 2.5135 4.06719 3.03581L14.884 11.7916C15.5292 12.3139 15.6289 13.2604 15.1066 13.9057V13.9057C14.5843 14.5509 13.6378 14.6506 12.9925 14.1283L2.17575 5.37247C1.5305 4.85016 1.43083 3.90367 1.95314 3.25842V3.25842Z" fill="currentColor"/></g><defs><filter id="filter0_d_51_63_new_hide" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_63"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_63" result="shape"/></filter><clipPath id="clip0_51_63_new_hide"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
 
 
         // --- Global State, IndexedDB, Utility Functions ---
@@ -411,8 +416,8 @@
 
         // --- Initialization ---
         window.addEventListener('load', async () => {
-            fab_playPauseButton.innerHTML = svgIconPlay;
-            fab_toggleVisibility.innerHTML = svgIconShow;
+            fab_playPauseButton.innerHTML = svgIconPlay_new; // Use new play icon
+            fab_toggleVisibility.innerHTML = svgIconShow_new; // Use new show icon
 
             const savedTheme = localStorage.getItem(STORAGE_APP_THEME) || 'light';
             applyAppTheme(savedTheme);
@@ -440,7 +445,7 @@
         
         fab_toggleVisibility.addEventListener('click', () => { 
             isHiding = !isHiding; 
-            fab_toggleVisibility.innerHTML = isHiding ? svgIconHide : svgIconShow; 
+            fab_toggleVisibility.innerHTML = isHiding ? svgIconHide_new : svgIconShow_new; 
             updateListVisibility(); 
         });
         fab_playPauseButton.addEventListener('click', togglePlayPause);
@@ -506,10 +511,10 @@
         // --- UI Population & Updates ---
         function populateAudioList() { audioList.innerHTML='';if(!currentDekItems||currentDekItems.length===0){updatePlaybackInfoAll();if(currentDekName)showStatus(`DEK "${decodeFileName(currentDekName)}" 中没有可播放的项目。`,'info');else showStatus("请选择或上传一个DEK文件。", "info");updateButtonStatesAll();return;}currentDekItems.forEach((item,index)=>{const li=document.createElement('li');li.dataset.index=index;li.dataset.filename=item.audioName||item.name;const chkCont=document.createElement('div');chkCont.className='checkbox-container';const chk=document.createElement('input');chk.type='checkbox';chk.checked=item.isChecked||false;chk.addEventListener('change',()=>{currentDekItems[index].isChecked=chk.checked;updateListVisibility();saveCurrentDekMetadataToStorage();});chkCont.appendChild(chk);li.appendChild(chkCont);const numSpan=document.createElement('span');numSpan.className='file-number';numSpan.textContent=`${index+1}.`;li.appendChild(numSpan);const contSpan=document.createElement('span');contSpan.className='file-content';contSpan.innerHTML=item.textContent?processText(item.textContent):decodeFileName(item.audioName||item.name);li.appendChild(contSpan);li.addEventListener('click',(e)=>{if(e.target!==chk&&!chkCont.contains(e.target)){playAudio(index);}});audioList.appendChild(li);}); updateListVisibility();updatePlaybackInfoAll();updateButtonStatesAll();}
         function updateListVisibility() { const items=audioList.getElementsByTagName('li');for(let i=0;i<items.length;i++){const itemEl=items[i];const dekIt=currentDekItems[i];if(dekIt){if(isHiding&&dekIt.isChecked){itemEl.classList.add('hidden');}else{itemEl.classList.remove('hidden');}}}}
-        function updateButtonStatesAll() { const hasDekLoadedAndItems=currentDekName&¤tDekItems.length>0;fab_playPauseButton.disabled=!hasDekLoadedAndItems;fab_toggleVisibility.disabled=!hasDekLoadedAndItems;bs_downloadDekButton.disabled=!currentDekZipBuffer;bs_sortOrder.disabled=!hasDekLoadedAndItems;bs_deleteCurrentDekButton.disabled=!currentDekName;bs_repeatCount.disabled=!hasDekLoadedAndItems;bs_playbackSpeed.disabled=!hasDekLoadedAndItems;bs_playMode.disabled=!hasDekLoadedAndItems;}
+        function updateButtonStatesAll() { const hasDekLoadedAndItems=currentDekName&&currentDekItems.length>0;fab_playPauseButton.disabled=!hasDekLoadedAndItems;fab_toggleVisibility.disabled=!hasDekLoadedAndItems;bs_downloadDekButton.disabled=!currentDekZipBuffer;bs_sortOrder.disabled=!hasDekLoadedAndItems;bs_deleteCurrentDekButton.disabled=!currentDekName;bs_repeatCount.disabled=!hasDekLoadedAndItems;bs_playbackSpeed.disabled=!hasDekLoadedAndItems;bs_playMode.disabled=!hasDekLoadedAndItems;}
         function resetPlayerState(fullReset = true) { 
             audioPlayer.pause();audioPlayer.src=''; 
-            fab_playPauseButton.innerHTML = svgIconPlay;
+            fab_playPauseButton.innerHTML = svgIconPlay_new; // Use new play icon
             currentDekItems.forEach(item=>{if(item.blobUrl)URL.revokeObjectURL(item.blobUrl);});currentDekItems=[];currentPlaylistIndex=-1;currentRepeatCount=0;audioList.innerHTML='';if(fullReset){currentDekName=null;currentDekZipBuffer=null;setActiveDekInSidebar(null);showStatus("播放器已重置。","info");}updateDekTitle();updatePlaybackInfoAll();updateButtonStatesAll();
         }
         let statusTimeout; function showStatus(message,type='info',duration=4000){clearTimeout(statusTimeout);statusMessage.textContent=message;statusMessage.className=type;if(duration>0){statusTimeout=setTimeout(()=>{statusMessage.textContent='';statusMessage.className='';},duration);}}
@@ -535,7 +540,7 @@
                 highlightPlayingItem(item.audioName||item.name);updatePlaybackInfoAll();
             }).catch(error=>{
                 console.error("播放音频错误:",error);showStatus(`播放 "${item.audioName||item.name}" 出错: ${error.message}`,"error");
-                fab_playPauseButton.innerHTML = svgIconPlay;
+                fab_playPauseButton.innerHTML = svgIconPlay_new; // Use new play icon
             }); 
             audioPlayer.onended=()=>{
                 currentRepeatCount++;
@@ -544,17 +549,17 @@
                     if(bs_playMode.value==='auto'){
                         const nextIdx=findNextVisiblePlayableItem(currentPlaylistIndex);
                         if(nextIdx!==-1){playAudio(nextIdx);}
-                        else{fab_playPauseButton.innerHTML = svgIconPlay;showStatus("已到达播放列表末尾。","info");}
+                        else{fab_playPauseButton.innerHTML = svgIconPlay_new;showStatus("已到达播放列表末尾。","info");} // Use new play icon
                     } else {
-                        fab_playPauseButton.innerHTML = svgIconPlay;
+                        fab_playPauseButton.innerHTML = svgIconPlay_new; // Use new play icon
                     }
                 }
             }; 
         }
-        function findNextVisiblePlayableItem(currentIndex) { for(let i=currentIndex+1;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){return i;}} if(bs_playMode.value==='auto'&¤tDekItems.length>0){for(let i=0;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){if(i===currentIndex&¤tDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length<=1){if(currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length>1)continue;}else if(i===currentIndex){continue;}return i;}}}return-1;}
+        function findNextVisiblePlayableItem(currentIndex) { for(let i=currentIndex+1;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){return i;}} if(bs_playMode.value==='auto'&&currentDekItems.length>0){for(let i=0;i<currentDekItems.length;i++){const item=currentDekItems[i];const liEl=audioList.querySelector(`li[data-index="${i}"]`);if(item&&item.originalPaths&&item.originalPaths.audio&&(!liEl||!liEl.classList.contains('hidden'))){if(i===currentIndex&&currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length<=1){if(currentDekItems.filter(it=>it.originalPaths&&it.originalPaths.audio&&!audioList.querySelector(`li[data-index="${currentDekItems.indexOf(it)}"]`)?.classList.contains('hidden')).length>1)continue;}else if(i===currentIndex){continue;}return i;}}}return-1;}
         
         function togglePlayPause() { 
-            if(!audioPlayer.src&¤tDekItems.length>0){
+            if(!audioPlayer.src&&currentDekItems.length>0){
                 const firstPlayable=findNextVisiblePlayableItem(-1);
                 if(firstPlayable!==-1){playAudio(firstPlayable);}
                 else{showStatus("播放列表中没有可见的可播放条目。","info");}
@@ -572,7 +577,7 @@
                 }
             } else {
                 audioPlayer.pause();
-                fab_playPauseButton.innerHTML = svgIconPlay;
+                fab_playPauseButton.innerHTML = svgIconPlay_new; // Use new play icon
             }
         }
         function highlightPlayingItem(filenameToHighlight) { const items=audioList.getElementsByTagName('li');for(let item of items){item.classList.remove('current-playing');if(item.dataset.filename===filenameToHighlight){item.classList.add('current-playing');item.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});}}}
