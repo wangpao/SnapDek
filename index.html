@@ -49,8 +49,8 @@
             --fab-actual-bg-color: #333333;
             --fab-actual-icon-color: #FFFFFF;
             --fab-hover-opacity: 0.85;
-            --fab-size: 48px; /* Adjusted size */
-            --fab-icon-size: 20px; /* Adjusted icon size */
+            --fab-size: 44px;
+            --fab-icon-size: 18px;
         }
 
         body.page-dark-theme {
@@ -95,10 +95,12 @@
             color: var(--sidebar-actual-text);
             padding: 8px;
             box-sizing: border-box;
-            height: 100vh;
+            height: 100%; /* 改为100%而不是100vh */
+            max-height: 100%; /* 添加最大高度限制 */
             position: fixed;
             left: 0;
             top: 0;
+            bottom: 0; /* 添加bottom:0确保侧边栏延伸到底部 */
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -118,6 +120,7 @@
         #sidebar-logo-container svg {
             height: 28px; 
             width: auto;
+            /* filter: var(--sidebar-logo-filter); Removed */
         }
 
         .upload-button-label-sidebar { display: block; background-color: var(--sidebar-actual-button-bg); color: var(--sidebar-actual-text); border: 1px solid var(--sidebar-actual-button-border); padding: 8px 12px; margin: 0 8px 15px 8px; border-radius: 6px; font-size: 0.875em; font-weight: 500; cursor: pointer; text-align: center; transition: background-color .2s, border-color .2s, color .2s; }
@@ -130,7 +133,7 @@
         .theme-button { flex: 1; background-color: transparent; color: var(--sidebar-actual-icon-color); border: 1px solid transparent; padding: 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
         .theme-button:hover { background-color: var(--sidebar-actual-icon-hover-bg); }
         .theme-button.active { background-color: var(--sidebar-actual-item-active-bg); border-color: var(--sidebar-actual-button-border); color: var(--sidebar-actual-text); }
-        .theme-button svg { width: 18px; height: 18px; fill: currentColor; }
+        .theme-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         #main-content { flex-grow: 1; margin-left: var(--sidebar-width); box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-color: var(--background-color); transition: background-color 0.3s; }
         .header-bar { display: flex; align-items: center; justify-content: space-between; height: var(--header-bar-height); padding: 0 10px; box-sizing: border-box; width: 100%; background-color: var(--bottom-sheet-bg); border-bottom: 1px solid var(--sidebar-actual-border-color); z-index: 100; flex-shrink: 0; color: var(--text-color); transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
@@ -159,85 +162,160 @@
         
 
         /* Floating Action Buttons Area */
-        .floating-action-buttons {
-            position: fixed;
-            bottom: 30px; /* Adjusted position */
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 1001;
-            gap: 12px;
-        }
-        .fab-button {
-            background-color: var(--fab-actual-bg-color);
-            color: var(--fab-actual-icon-color);
-            border: none;
-            border-radius: 50%;
-            width: var(--fab-size);
-            height: var(--fab-size);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-            cursor: pointer;
-            transition: opacity 0.2s ease-out, background-color 0.3s, color 0.3s;
-            padding: 0;
-        }
-        .fab-button:hover {
-            opacity: var(--fab-hover-opacity);
-        }
-        .fab-button:active {
-            opacity: 1;
-        }
-        .fab-button svg {
-            width: var(--fab-icon-size);
-            height: var(--fab-icon-size);
-            fill: currentColor;
-        }
-        .fab-button[disabled] {
-            background-color: #565869;
-            color: #8e8ea0;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
+        .floating-action-buttons { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; z-index: 1001; gap: 12px; }
+        .fab-button { background-color: var(--fab-actual-bg-color); color: var(--fab-actual-icon-color); border: none; border-radius: 50%; width: var(--fab-size); height: var(--fab-size); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.25); cursor: pointer; transition: opacity 0.2s ease-out, background-color 0.3s, color 0.3s; padding: 0; }
+        .fab-button:hover { opacity: var(--fab-hover-opacity); }
+        .fab-button:active { opacity: 1; }
+        .fab-button svg { width: var(--fab-icon-size); height: var(--fab-icon-size); fill: currentColor; }
+        .fab-button[disabled] { background-color: #565869; color: #8e8ea0; cursor: not-allowed; opacity: 0.6; }
 
 
         /* Bottom Sheet (Settings Menu) */
         #bottomSheetOverlay { position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.4);z-index:1000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s; }
         #bottomSheetOverlay.visible { opacity:1;visibility:visible;transition:opacity .3s ease,visibility 0s linear 0s; }
-        #bottomSheet { position:fixed;bottom:0;left:0;right:0;background-color:var(--bottom-sheet-bg);border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -2px 10px rgba(0,0,0,.15);padding-bottom:env(safe-area-inset-bottom,15px);max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s ease-in-out, background-color 0.3s;z-index:1002; }
+        #bottomSheet {
+            position:fixed;
+            bottom:0;
+            left:0;
+            right:0;
+            background-color:var(--sidebar-actual-bg);
+            border-top-left-radius:16px;
+            border-top-right-radius:16px;
+            box-shadow:0 -2px 10px rgba(0,0,0,.15);
+            padding-bottom:env(safe-area-inset-bottom,15px);
+            max-height:75vh;
+            overflow-y:auto;
+            transform:translateY(100%);
+            transition:transform .3s ease-in-out, background-color 0.3s;
+            z-index:1002;
+        }
         #bottomSheet.visible { transform:translateY(0); }
-        .bottom-sheet-header { padding:15px 20px;font-size:1.1em;font-weight:700;color:var(--text-color);border-bottom:1px solid var(--sidebar-actual-border-color);background-color:var(--bottom-sheet-header-bg);border-top-left-radius:16px;border-top-right-radius:16px;display:flex;justify-content:space-between;align-items:center; transition: background-color 0.3s, border-color 0.3s, color 0.3s;}
-        .bottom-sheet-close { background:0 0;border:none;font-size:1.5em;color:var(--text-color);cursor:pointer;padding:5px;line-height:1;margin:0;width:auto; transition: color 0.3s;}
+        .bottom-sheet-header {
+            padding:15px 20px;
+            font-size:1.1em;
+            font-weight:700;
+            color:var(--sidebar-actual-text);
+            border-bottom:1px solid var(--sidebar-actual-border-color);
+            background-color:var(--sidebar-actual-bg);
+            border-top-left-radius:16px;
+            border-top-right-radius:16px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+        .bottom-sheet-close {
+            background:0 0;
+            border:none;
+            font-size:1.5em;
+            color:var(--sidebar-actual-icon-color);
+            cursor:pointer;
+            padding:5px;
+            line-height:1;
+            margin:0;
+            width:auto;
+            transition: color 0.3s, background-color 0.2s;
+            border-radius: 4px;
+        }
+        .bottom-sheet-close:hover {
+            background-color: var(--sidebar-actual-icon-hover-bg);
+        }
         .bottom-sheet-content { padding:15px 20px;display:grid;gap:15px; }
         .bottom-sheet-section { margin-bottom:10px; }
-        .bottom-sheet-section h3 { font-size:.9em;color: #777; margin-top:0;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px; transition: color 0.3s;}
-        body.page-dark-theme .bottom-sheet-section h3 { color: #aaa; }
-        #bottomSheet button, #bottomSheet select { background-color:var(--item-hover-color);color:var(--text-color);border:1px solid var(--sidebar-actual-button-border); transition: background-color 0.3s, border-color 0.3s, color 0.3s;}
-        #bottomSheet button:hover, #bottomSheet select:hover { background-color:var(--sidebar-actual-button-hover-bg);border-color:var(--sidebar-actual-button-border);}
-        #bottomSheet button.action { background-color:var(--button-action-color);color:#fff;border:none;}
-        #bottomSheet button.action:hover { background-color:#d35400;}
-        #bottomSheet button.danger { background-color: var(--button-danger-color); color: white; border: none; }
-        #bottomSheet button.danger:hover { background-color: #c0392b; }
+        .bottom-sheet-section h3 {
+            font-size:.9em;
+            color: var(--sidebar-actual-icon-color);
+            margin-top:0;margin-bottom:8px;
+            text-transform:uppercase;
+            letter-spacing:.5px;
+            transition: color 0.3s;
+        }
+        body.page-dark-theme #bottomSheet {
+            background-color: #202123;
+        }
+        body.page-dark-theme .bottom-sheet-header {
+            color: #ECECEC;
+            background-color: #202123;
+            border-bottom-color: #3A3B3C;
+        }
+        body.page-dark-theme .bottom-sheet-close {
+            color: #C5C5D2;
+        }
+        body.page-dark-theme .bottom-sheet-close:hover {
+            background-color: #2A2B32;
+        }
+        body.page-dark-theme .bottom-sheet-section h3 {
+            color: #C5C5D2;
+        }
+        #bottomSheet button, #bottomSheet select {
+            background-color:var(--sidebar-actual-button-bg);
+            color:var(--sidebar-actual-text);
+            border:1px solid var(--sidebar-actual-button-border);
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        #bottomSheet button:hover, #bottomSheet select:hover {
+            background-color:var(--sidebar-actual-button-hover-bg);
+            border-color:var(--sidebar-actual-button-border);
+        }
+        body.page-dark-theme #bottomSheet button,
+        body.page-dark-theme #bottomSheet select {
+            background-color: #343541;
+            color: #ECECEC;
+            border-color: #4A4B52;
+        }
+        body.page-dark-theme #bottomSheet button:hover,
+        body.page-dark-theme #bottomSheet select:hover {
+            background-color: #40414F;
+            border-color: #4A4B52;
+        }
+        #bottomSheet button.action { 
+            background-color:var(--button-action-color);
+            color:#fff;
+            border:none;
+        }
+        #bottomSheet button.action:hover { 
+            background-color:#d35400;
+        }
+        #bottomSheet button.danger { 
+            background-color: var(--button-danger-color); 
+            color: white; 
+            border: none; 
+        }
+        #bottomSheet button.danger:hover { 
+            background-color: #c0392b; 
+        }
 
 
         /* Mobile View Adjustments */
         @media (max-width: 768px) {
-            #sidebar { transform:translateX(-100%); box-shadow:2px 0 5px rgba(0,0,0,.2); }
+            #sidebar { 
+                transform:translateX(-100%); 
+                box-shadow:2px 0 5px rgba(0,0,0,.2);
+                /* 确保在移动设备上考虑安全区域 */
+                height: 100%; /* 改为100%而不是100vh */
+                padding-bottom: env(safe-area-inset-bottom, 20px);
+            }
             #sidebar.open { transform:translateX(0); }
             #main-content { margin-left:0; width:100%; }
             #hamburgerButton { display:flex; }
             .header-bar { left: 0; }
             #currentDekTitle { text-align: left; margin-left: 5px; }
-             .bottom-sheet-content { grid-template-columns: 1fr; }
+            .bottom-sheet-content { grid-template-columns: 1fr; }
+            
+            /* 确保主题切换按钮在底部有足够空间 */
+            #sidebar-theme-switcher {
+                margin-bottom: env(safe-area-inset-bottom, 20px);
+            }
         }
         @media (min-width: 601px) {
             .bottom-sheet-content { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
         }
         @media (max-width: 480px) {
-            .fab-button { width: 44px; height: 44px; } /* Adjusted for small screens */
-            .fab-button svg { width: 18px; height: 18px; } /* Adjusted icon size for small screens */
+            .fab-button { width: 40px; height: 40px; }
+            .fab-button svg { width: 16px; height: 16px; }
             #bottomSheet { max-height: 85vh; }
             #currentDekTitle { font-size: 0.9em; }
             #headerPlaybackInfo { font-size: 0.8em; padding: 1px 4px; }
@@ -250,6 +328,7 @@
         <div id="sidebar-scrollable-content">
             <div id="sidebar-logo-container">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Removed background rect -->
                     <rect x="5" y="7.24963" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 7.24963)" fill="#FF4900"/>
                     <rect x="5" y="13.572" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 13.572)" fill="#FFBC00"/>
                     <rect x="5" y="19.8439" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 19.8439)" fill="#F5EC00"/>
@@ -261,10 +340,10 @@
         </div>
         <div id="sidebar-theme-switcher">
             <button id="theme-button-light" class="theme-button" aria-label="浅色模式">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zm-9-7c0-.55-.45-1-1-1V3c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1s1-.45 1-1zm0 12c0-.55-.45-1-1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1s1-.45 1-1zm6.36-8.64c-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41zm-11.32 8.49c-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41zM4.93 4.93c-.39-.39-1.02-.39-1.41 0L2.1 6.34c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41zm12.73 12.73c-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42c.39-.39.39-1.02 0-1.41z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
             </button>
             <button id="theme-button-dark" class="theme-button" aria-label="深色模式">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon-star"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path></svg>
             </button>
         </div>
     </aside>
@@ -285,10 +364,10 @@
 
     <div class="floating-action-buttons">
         <button id="fab_toggleVisibility" class="fab-button" title="隐藏/显示选中" aria-label="隐藏/显示选中">
-            <!-- Show/Hide Icon SVG will be inserted here by JS -->
+            <!-- Show Icon SVG will be inserted here by JS -->
         </button>
         <button id="fab_playPauseButton" class="fab-button" title="播放/暂停" aria-label="播放/暂停" disabled>
-            <!-- Play/Pause Icon SVG will be inserted here by JS -->
+            <!-- Play Icon SVG will be inserted here by JS -->
         </button>
         <button id="settingsButton" class="fab-button" title="设置" aria-label="打开设置">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -359,10 +438,10 @@
         const themeButtonDark = document.getElementById('theme-button-dark');
 
         // --- SVG Icon Definitions ---
-        const svgIconPlay = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 2.25195C4 1.27741 5.06571 0.677697 5.89871 1.18347L16.3459 7.52636C17.1476 8.01311 17.1476 9.17661 16.3459 9.66336L5.89871 16.0062C5.06571 16.512 4 15.9123 4 14.9378V2.25195Z" fill="currentColor"/></svg>`;
+        const svgIconPlay = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 2.25195C3 1.27741 4.06571 0.677697 4.89871 1.18347L15.3459 7.52636C16.1476 8.01311 16.1476 9.17661 15.3459 9.66336L4.89871 16.0062C4.06571 16.512 3 15.9123 3 14.9378V2.25195Z" fill="currentColor"/></svg>`;
         const svgIconPause = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.35875 16.34H6.68806C7.57686 16.34 8.04682 15.9069 8.04682 15.0782V2.25244C8.04682 1.39551 7.57686 1 6.68806 1H4.35875C3.46995 1 3 1.43318 3 2.25244V15.0782C3 15.9069 3.46995 16.34 4.35875 16.34ZM11.7859 16.34H14.105C15.004 16.34 15.4638 15.9069 15.4638 15.0782V2.25244C15.4638 1.39551 15.004 1 14.105 1H11.7859C10.8869 1 10.417 1.43318 10.417 2.25244V15.0782C10.417 15.9069 10.8869 16.34 11.7859 16.34Z" fill="currentColor"/></svg>`;
-        const svgIconShow = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_fab_show)"><g filter="url(#filter0_d_fab_show)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g></g><defs><filter id="filter0_d_fab_show" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_44"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_44" result="shape"/></filter><clipPath id="clip0_fab_show"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
-        const svgIconHide = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_fab_hide)"><g filter="url(#filter0_d_fab_hide)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 3C5.27071 3 2.00139 4.96023 0.170541 7.90366C-0.0568469 8.26922 -0.056847 8.73078 0.170541 9.09634C2.00139 12.0398 5.27071 14 9 14C12.7293 14 15.9986 12.0398 17.8295 9.09634C18.0568 8.73078 18.0568 8.26922 17.8295 7.90366C15.9986 4.96023 12.7293 3 9 3ZM8.91128 12.7059C11.0616 12.7059 12.8047 10.9677 12.8047 8.82353C12.8047 6.67937 11.0616 4.94118 8.91128 4.94118C6.761 4.94118 5.01784 6.67937 5.01784 8.82353C5.01784 10.9677 6.761 12.7059 8.91128 12.7059Z" fill="currentColor"/><path d="M10.2091 8.82353C10.2091 9.53825 9.62805 10.1176 8.91128 10.1176C8.19452 10.1176 7.61347 9.53825 7.61347 8.82353C7.61347 8.10881 8.19452 7.52941 8.91128 7.52941C9.62805 7.52941 10.2091 8.10881 10.2091 8.82353Z" fill="currentColor"/></g><path d="M1.95314 3.25842C2.47545 2.61317 3.42194 2.5135 4.06719 3.03581L14.884 11.7916C15.5292 12.3139 15.6289 13.2604 15.1066 13.9057V13.9057C14.5843 14.5509 13.6378 14.6506 12.9925 14.1283L2.17575 5.37247C1.5305 4.85016 1.43083 3.90367 1.95314 3.25842V3.25842Z" fill="currentColor"/></g><defs><filter id="filter0_d_fab_hide" x="-2.4" y="1.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_63"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_63" result="shape"/></filter><clipPath id="clip0_fab_hide"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+        const svgIconShow = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_51_44_show)"><g filter="url(#filter0_d_51_44_show)"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 2C5.27071 2 2.00139 3.96023 0.170541 6.90366C-0.0568469 7.26922 -0.056847 7.73078 0.170541 8.09634C2.00139 11.0398 5.27071 13 9 13C12.7293 13 15.9986 11.0398 17.8295 8.09634C18.0568 7.73078 18.0568 7.26922 17.8295 6.90366C15.9986 3.96023 12.7293 2 9 2ZM8.91128 11.7059C11.0616 11.7059 12.8047 9.96769 12.8047 7.82353C12.8047 5.67937 11.0616 3.94118 8.91128 3.94118C6.761 3.94118 5.01784 5.67937 5.01784 7.82353C5.01784 9.96769 6.761 11.7059 8.91128 11.7059Z" fill="currentColor"/><path d="M5.34032 7.51832C5.13329 7.99875 5.01708 8.52926 5.01708 9.08668C5.01742 11.2583 6.76068 13.0191 8.91063 13.0193C9.26589 13.0193 9.61 12.9697 9.937 12.8796L11.0122 14.1326C10.3611 14.2618 9.68811 14.3298 8.9995 14.3298C5.2705 14.3298 2.00131 12.3443 0.170401 9.36305C-0.056894 8.99288 -0.0567063 8.52528 0.170401 8.15504C0.941078 6.89994 1.96685 5.82125 3.17431 4.99293L5.34032 7.51832ZM8.91063 5.15406C8.53009 5.15409 8.16251 5.20944 7.81493 5.31226L12.4497 10.7166C12.6749 10.2197 12.8041 9.66893 12.8042 9.08668C12.8042 6.91467 11.0609 5.15408 8.91063 5.15406Z" fill="currentColor"/></g></g><defs><filter id="filter0_d_51_44_show" x="-2.4" y="0.8" width="22.8" height="15.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1.2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_51_44"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_51_44" result="shape"/></filter><clipPath id="clip0_51_44_show"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`;
+        const svgIconHide = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.54735 2.30933C4.08639 1.84739 4.89771 1.91005 5.35985 2.44898L6.30028 3.54664C7.16097 3.31273 8.06562 3.18728 8.9995 3.18726C12.7288 3.18728 15.9987 5.17338 17.8296 8.15504C18.0565 8.52522 18.0568 8.993 17.8296 9.36305C16.948 10.7987 15.7311 12.0009 14.2915 12.864L15.2183 13.9451C15.6803 14.484 15.6182 15.2953 15.0796 15.7576C14.5405 16.2198 13.7283 16.1579 13.2661 15.6189L3.40771 4.12281C2.94548 3.58377 3.00832 2.77156 3.54735 2.30933ZM5.34032 7.51832C5.13329 7.99875 5.01708 8.52926 5.01708 9.08668C5.01742 11.2583 6.76068 13.0191 8.91063 13.0193C9.26589 13.0193 9.61 12.9697 9.937 12.8796L11.0122 14.1326C10.3611 14.2618 9.68811 14.3298 8.9995 14.3298C5.2705 14.3298 2.00131 12.3443 0.170401 9.36305C-0.056894 8.99288 -0.0567063 8.52528 0.170401 8.15504C0.941078 6.89994 1.96685 5.82125 3.17431 4.99293L5.34032 7.51832ZM8.91063 5.15406C8.53009 5.15409 8.16251 5.20944 7.81493 5.31226L12.4497 10.7166C12.6749 10.2197 12.8041 9.66893 12.8042 9.08668C12.8042 6.91467 11.0609 5.15408 8.91063 5.15406Z" fill="currentColor"/></svg>`;
 
 
         // --- Global State, IndexedDB, Utility Functions ---
@@ -449,7 +528,8 @@
         async function handleDeleteCurrentDek() {
             if (!currentDekName) { showStatus("没有选中的DEK可删除。", "info"); return; }
             const confirmDelete = window.confirm(`确定要删除DEK "${decodeFileName(currentDekName)}" 吗？此操作无法撤销。`);
-            if (confirmDelete) { showStatus(`正在删除 ${decodeFileName(currentDekName)}...`, "info", 0); try { await clearAudioDataForDek(currentDekName); localStorage.removeItem(STORAGE_DEK_DATA_PREFIX + currentDekName); let knownDeks = getKnownDekNames(); const indexToRemove = knownDeks.indexOf(currentDekName); if (indexToRemove > -1) { knownDeks.splice(indexToRemove, 1); saveKnownDekNames(knownDeks); } if (localStorage.getItem('dekPlayer_lastOpenedDek') === currentDekName) { localStorage.removeItem('dekPlayer_lastOpenedDek'); } showStatus(`"${decodeFileName(currentDekName)}" 已成功删除。`, "success"); const dekNameToSelectAfterDelete = knownDeks.length > 0 ? knownDeks[0] : null; resetPlayerState(true); populateDekSidebarList(); if (dekNameToSelectAfterDelete) { await loadDekDataFromStorage(dekNameToSelectAfterDelete); } } catch (error) { console.error("删除DEK时出错:", error); showStatus(`删除 "${decodeFileName(currentDekName)}" 失败: ${error.message}`, "error"); } finally { closeBottomSheet(); } }
+            if (confirmDelete) { showStatus(`正在删除 ${decodeFileName(currentDekName)}...`, "info", 0); try { await clearAudioDataForDek(currentDekName); localStorage.removeItem(STORAGE_DEK_DATA_PREFIX + currentDekName); let knownDeks = getKnownDekNames();
+                if (knownDeks.includes(currentDekName)) { knownDeks.splice(knownDeks.indexOf(currentDekName), 1); saveKnownDekNames(knownDeks); } if (localStorage.getItem('dekPlayer_lastOpenedDek') === currentDekName) { localStorage.removeItem('dekPlayer_lastOpenedDek'); } showStatus(`"${decodeFileName(currentDekName)}" 已成功删除。`, "success"); const dekNameToSelectAfterDelete = knownDeks.length > 0 ? knownDeks[0] : null; resetPlayerState(true); populateDekSidebarList(); if (dekNameToSelectAfterDelete) { await loadDekDataFromStorage(dekNameToSelectAfterDelete); } } catch (error) { console.error("删除DEK时出错:", error); showStatus(`删除 "${decodeFileName(currentDekName)}" 失败: ${error.message}`, "error"); } finally { closeBottomSheet(); } }
         }
 
         // --- DEK Processing & Storage Functions ---
@@ -474,7 +554,7 @@
                     sortCurrentDekItems(); populateAudioList(); saveCurrentDekMetadataToStorage(); addKnownDekName(currentDekName); populateDekSidebarList(); setActiveDekInSidebar(currentDekName); localStorage.setItem('dekPlayer_lastOpenedDek', currentDekName);
                     showStatus(`${decodeFileName(currentDekName)} 加载成功! 共 ${currentDekItems.length} 个可播放条目。`, 'success');
                     if (window.innerWidth <= 768) { sidebar.classList.remove('open'); }
-                } catch (err) { console.error("处理DEK文件失败:", err); showStatus(`处理 ${decodeFileName(currentDekName)} 文件失败: ${err.message}`, 'error'); currentDekName=null; currentDekZipBuffer=null; updateDekTitle();}
+                } catch (err) { console.error("处理DEK文件失败:", err); showStatus(`处理 ${decodeFileName(currentDekName)} 文件失败: ${err.message}`, 'error'); currentDekName=null; currentDekZipBuffer=null; updateButtonStatesAll(); updateDekTitle();}
                 finally { dekFileUploadInputSidebar.value=''; updateButtonStatesAll(); }
             };
             reader.onerror = () => { showStatus('读取文件时出错。','error');currentDekName=null;currentDekZipBuffer=null;updateButtonStatesAll();updateDekTitle();};
