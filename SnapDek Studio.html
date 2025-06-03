@@ -286,20 +286,16 @@
         <div id="input-panel">
             <h2 data-translate-key="input-panel-heading">Input</h2>
             <textarea id="text" rows="15" placeholder="" data-translate-key="input-placeholder"></textarea>
-            <select id="voice">
-                <option value="de-DE-SeraphinaMultilingualNeural">de-DE-SeraphinaMultilingualNeural (Female)</option>
-                <option value="de-DE-FlorianMultilingualNeural">de-DE-FlorianMultilingualNeural (Male)</option>
-                <option value="de-DE-AmalaNeural">de-DE-AmalaNeural (Female)</option>
-                <option value="de-DE-ConradNeural">de-DE-ConradNeural (Male)</option>
-                <option value="de-DE-KatjaNeural">de-DE-KatjaNeural (Female)</option>
-                <option value="de-DE-KillianNeural">de-DE-KillianNeural (Male)</option>
-                <option value="zh-CN-XiaoxiaoNeural">zh-CN-XiaoxiaoNeural (Female)</option>
-                <option value="zh-CN-XiaoyiNeural">zh-CN-XiaoyiNeural (Female)</option>
-                <option value="zh-CN-YunjianNeural">zh-CN-YunjianNeural (Male)</option>
-                <option value="zh-CN-YunxiNeural">zh-CN-YunxiNeural (Male)</option>
-                <option value="zh-CN-YunxiaNeural">zh-CN-YunxiaNeural (Male)</option>
-                <option value="zh-CN-YunyangNeural">zh-CN-YunyangNeural (Male)</option>
-            </select>
+            
+            <label for="languageSelect" data-translate-key="language-label" style="display: block; margin-bottom: 4px; font-size: 14px; color: var(--text-secondary-color);">Language</label>
+            <select id="languageSelect"></select>
+
+            <label for="genderSelect" data-translate-key="gender-label" style="display: block; margin-bottom: 4px; margin-top: 8px; font-size: 14px; color: var(--text-secondary-color);">Gender</label>
+            <select id="genderSelect"></select>
+
+            <label for="voiceNameSelect" data-translate-key="voice-name-label" style="display: block; margin-bottom: 4px; margin-top: 8px; font-size: 14px; color: var(--text-secondary-color);">Voice Name</label>
+            <select id="voiceNameSelect"></select>
+
             <button id="generate" data-translate-key="generate-button">Generate Audio & TXT Files</button>
             <button id="download" style="display: none;" data-translate-key="download-button">Download Dek</button>
             <div id="progress" style="display: none;">
@@ -329,19 +325,160 @@
         const generateBtn = document.getElementById('generate');
         const downloadBtn = document.getElementById('download');
         const textArea = document.getElementById('text');
-        const voiceSelect = document.getElementById('voice');
+        
+        const languageSelect = document.getElementById('languageSelect');
+        const genderSelect = document.getElementById('genderSelect');
+        const voiceNameSelect = document.getElementById('voiceNameSelect'); 
+
         const progressDiv = document.getElementById('progress');
         const previewTitleElement = document.getElementById('previewTitle');
         const previewList = document.getElementById('previewList');
         const statusSpan = document.getElementById('status');
         const progressBar = document.getElementById('progressBar');
-        const logDiv = document.getElementById('log');
         const previewAudioPlayer = document.getElementById('previewAudioPlayer');
         const languageSwitcher = document.getElementById('language-switcher');
 
         let zip = new JSZip();
-        let generatedAudioData = {}; // To store { index: blob }
+        let generatedAudioData = {}; 
         let currentPreviewAudioUrl = null;
+        let parsedVoices = [];
+
+        const voiceDataText = `Short Name	Gender	Locale	Friendly Name
+de-AT-IngridNeural	Female	de-AT	Microsoft Ingrid Online (Natural) - German (Austria)
+de-AT-JonasNeural	Male	de-AT	Microsoft Jonas Online (Natural) - German (Austria)
+de-DE-SeraphinaMultilingualNeural	Female	de-DE	Microsoft SeraphinaMultilingual Online (Natural) - German (Germany)
+de-DE-FlorianMultilingualNeural	Male	de-DE	Microsoft FlorianMultilingual Online (Natural) - German (Germany)
+de-DE-AmalaNeural	Female	de-DE	Microsoft Amala Online (Natural) - German (Germany)
+de-DE-ConradNeural	Male	de-DE	Microsoft Conrad Online (Natural) - German (Germany)
+de-DE-KatjaNeural	Female	de-DE	Microsoft Katja Online (Natural) - German (Germany)
+de-DE-KillianNeural	Male	de-DE	Microsoft Killian Online (Natural) - German (Germany)
+de-CH-JanNeural	Male	de-CH	Microsoft Jan Online (Natural) - German (Switzerland)
+de-CH-LeniNeural	Female	de-CH	Microsoft Leni Online (Natural) - German (Switzerland)
+en-AU-NatashaNeural	Female	en-AU	Microsoft Natasha Online (Natural) - English (Australia)
+en-AU-WilliamNeural	Male	en-AU	Microsoft William Online (Natural) - English (Australia)
+en-CA-ClaraNeural	Female	en-CA	Microsoft Clara Online (Natural) - English (Canada)
+en-CA-LiamNeural	Male	en-CA	Microsoft Liam Online (Natural) - English (Canada)
+en-HK-YanNeural	Female	en-HK	Microsoft Yan Online (Natural) - English (Hong Kong SAR)
+en-HK-SamNeural	Male	en-HK	Microsoft Sam Online (Natural) - English (Hongkong)
+en-IN-NeerjaExpressiveNeural	Female	en-IN	Microsoft Neerja Online (Natural) - English (India) (Preview)
+en-IN-NeerjaNeural	Female	en-IN	Microsoft Neerja Online (Natural) - English (India)
+en-IN-PrabhatNeural	Male	en-IN	Microsoft Prabhat Online (Natural) - English (India)
+en-IE-ConnorNeural	Male	en-IE	Microsoft Connor Online (Natural) - English (Ireland)
+en-IE-EmilyNeural	Female	en-IE	Microsoft Emily Online (Natural) - English (Ireland)
+en-KE-AsiliaNeural	Female	en-KE	Microsoft Asilia Online (Natural) - English (Kenya)
+en-KE-ChilembaNeural	Male	en-KE	Microsoft Chilemba Online (Natural) - English (Kenya)
+en-NZ-MitchellNeural	Male	en-NZ	Microsoft Mitchell Online (Natural) - English (New Zealand)
+en-NZ-MollyNeural	Female	en-NZ	Microsoft Molly Online (Natural) - English (New Zealand)
+en-NG-AbeoNeural	Male	en-NG	Microsoft Abeo Online (Natural) - English (Nigeria)
+en-NG-EzinneNeural	Female	en-NG	Microsoft Ezinne Online (Natural) - English (Nigeria)
+en-PH-JamesNeural	Male	en-PH	Microsoft James Online (Natural) - English (Philippines)
+en-PH-RosaNeural	Female	en-PH	Microsoft Rosa Online (Natural) - English (Philippines)
+en-US-AvaNeural	Female	en-US	Microsoft Ava Online (Natural) - English (United States)
+en-US-AndrewNeural	Male	en-US	Microsoft Andrew Online (Natural) - English (United States)
+en-US-EmmaNeural	Female	en-US	Microsoft Emma Online (Natural) - English (United States)
+en-US-BrianNeural	Male	en-US	Microsoft Brian Online (Natural) - English (United States)
+en-SG-LunaNeural	Female	en-SG	Microsoft Luna Online (Natural) - English (Singapore)
+en-SG-WayneNeural	Male	en-SG	Microsoft Wayne Online (Natural) - English (Singapore)
+en-ZA-LeahNeural	Female	en-ZA	Microsoft Leah Online (Natural) - English (South Africa)
+en-ZA-LukeNeural	Male	en-ZA	Microsoft Luke Online (Natural) - English (South Africa)
+en-TZ-ElimuNeural	Male	en-TZ	Microsoft Elimu Online (Natural) - English (Tanzania)
+en-TZ-ImaniNeural	Female	en-TZ	Microsoft Imani Online (Natural) - English (Tanzania)
+en-GB-LibbyNeural	Female	en-GB	Microsoft Libby Online (Natural) - English (United Kingdom)
+en-GB-MaisieNeural	Female	en-GB	Microsoft Maisie Online (Natural) - English (United Kingdom)
+en-GB-RyanNeural	Male	en-GB	Microsoft Ryan Online (Natural) - English (United Kingdom)
+en-GB-SoniaNeural	Female	en-GB	Microsoft Sonia Online (Natural) - English (United Kingdom)
+en-GB-ThomasNeural	Male	en-GB	Microsoft Thomas Online (Natural) - English (United Kingdom)
+en-US-AnaNeural	Female	en-US	Microsoft Ana Online (Natural) - English (United States)
+en-US-AndrewMultilingualNeural	Male	en-US	Microsoft AndrewMultilingual Online (Natural) - English (United States)
+en-US-AriaNeural	Female	en-US	Microsoft Aria Online (Natural) - English (United States)
+en-US-AvaMultilingualNeural	Female	en-US	Microsoft AvaMultilingual Online (Natural) - English (United States)
+en-US-BrianMultilingualNeural	Male	en-US	Microsoft BrianMultilingual Online (Natural) - English (United States)
+en-US-ChristopherNeural	Male	en-US	Microsoft Christopher Online (Natural) - English (United States)
+en-US-EmmaMultilingualNeural	Female	en-US	Microsoft EmmaMultilingual Online (Natural) - English (United States)
+en-US-EricNeural	Male	en-US	Microsoft Eric Online (Natural) - English (United States)
+en-US-GuyNeural	Male	en-US	Microsoft Guy Online (Natural) - English (United States)
+en-US-JennyNeural	Female	en-US	Microsoft Jenny Online (Natural) - English (United States)
+en-US-MichelleNeural	Female	en-US	Microsoft Michelle Online (Natural) - English (United States)
+en-US-RogerNeural	Male	en-US	Microsoft Roger Online (Natural) - English (United States)
+en-US-SteffanNeural	Male	en-US	Microsoft Steffan Online (Natural) - English (United States)
+zh-HK-HiuGaaiNeural	Female	zh-HK	Microsoft HiuGaai Online (Natural) - Chinese (Cantonese Traditional)
+zh-HK-HiuMaanNeural	Female	zh-HK	Microsoft HiuMaan Online (Natural) - Chinese (Hong Kong SAR)
+zh-HK-WanLungNeural	Male	zh-HK	Microsoft WanLung Online (Natural) - Chinese (Hong Kong SAR)
+zh-CN-XiaoxiaoNeural	Female	zh-CN	Microsoft Xiaoxiao Online (Natural) - Chinese (Mainland)
+zh-CN-XiaoyiNeural	Female	zh-CN	Microsoft Xiaoyi Online (Natural) - Chinese (Mainland)
+zh-CN-YunjianNeural	Male	zh-CN	Microsoft Yunjian Online (Natural) - Chinese (Mainland)
+zh-CN-YunxiNeural	Male	zh-CN	Microsoft Yunxi Online (Natural) - Chinese (Mainland)
+zh-CN-YunxiaNeural	Male	zh-CN	Microsoft Yunxia Online (Natural) - Chinese (Mainland)
+zh-CN-YunyangNeural	Male	zh-CN	Microsoft Yunyang Online (Natural) - Chinese (Mainland)
+zh-CN-liaoning-XiaobeiNeural	Female	zh-CN-liaoning	Microsoft Xiaobei Online (Natural) - Chinese (Northeastern Mandarin)
+zh-TW-HsiaoChenNeural	Female	zh-TW	Microsoft HsiaoChen Online (Natural) - Chinese (Taiwan)
+zh-TW-YunJheNeural	Male	zh-TW	Microsoft YunJhe Online (Natural) - Chinese (Taiwan)
+zh-TW-HsiaoYuNeural	Female	zh-TW	Microsoft HsiaoYu Online (Natural) - Chinese (Taiwanese Mandarin)
+zh-CN-shaanxi-XiaoniNeural	Female	zh-CN-shaanxi	Microsoft Xiaoni Online (Natural) - Chinese (Zhongyuan Mandarin Shaanxi)
+fr-BE-CharlineNeural	Female	fr-BE	Microsoft Charline Online (Natural) - French (Belgium)
+fr-BE-GerardNeural	Male	fr-BE	Microsoft Gerard Online (Natural) - French (Belgium)
+fr-CA-ThierryNeural	Male	fr-CA	Microsoft Thierry Online (Natural) - French (Canada)
+fr-CA-AntoineNeural	Male	fr-CA	Microsoft Antoine Online (Natural) - French (Canada)
+fr-CA-JeanNeural	Male	fr-CA	Microsoft Jean Online (Natural) - French (Canada)
+fr-CA-SylvieNeural	Female	fr-CA	Microsoft Sylvie Online (Natural) - French (Canada)
+fr-FR-VivienneMultilingualNeural	Female	fr-FR	Microsoft VivienneMultilingual Online (Natural) - French (France)
+fr-FR-RemyMultilingualNeural	Male	fr-FR	Microsoft RemyMultilingual Online (Natural) - French (France)
+fr-FR-DeniseNeural	Female	fr-FR	Microsoft Denise Online (Natural) - French (France)
+fr-FR-EloiseNeural	Female	fr-FR	Microsoft Eloise Online (Natural) - French (France)
+fr-FR-HenriNeural	Male	fr-FR	Microsoft Henri Online (Natural) - French (France)
+fr-CH-ArianeNeural	Female	fr-CH	Microsoft Ariane Online (Natural) - French (Switzerland)
+fr-CH-FabriceNeural	Male	fr-CH	Microsoft Fabrice Online (Natural) - French (Switzerland)
+es-AR-ElenaNeural	Female	es-AR	Microsoft Elena Online (Natural) - Spanish (Argentina)
+es-AR-TomasNeural	Male	es-AR	Microsoft Tomas Online (Natural) - Spanish (Argentina)
+es-BO-MarceloNeural	Male	es-BO	Microsoft Marcelo Online (Natural) - Spanish (Bolivia)
+es-BO-SofiaNeural	Female	es-BO	Microsoft Sofia Online (Natural) - Spanish (Bolivia)
+es-CL-CatalinaNeural	Female	es-CL	Microsoft Catalina Online (Natural) - Spanish (Chile)
+es-CL-LorenzoNeural	Male	es-CL	Microsoft Lorenzo Online (Natural) - Spanish (Chile)
+es-CO-GonzaloNeural	Male	es-CO	Microsoft Gonzalo Online (Natural) - Spanish (Colombia)
+es-CO-SalomeNeural	Female	es-CO	Microsoft Salome Online (Natural) - Spanish (Colombia)
+es-ES-XimenaNeural	Female	es-ES	Microsoft Ximena Online (Natural) - Spanish (Colombia)
+es-CR-JuanNeural	Male	es-CR	Microsoft Juan Online (Natural) - Spanish (Costa Rica)
+es-CR-MariaNeural	Female	es-CR	Microsoft Maria Online (Natural) - Spanish (Costa Rica)
+es-CU-BelkysNeural	Female	es-CU	Microsoft Belkys Online (Natural) - Spanish (Cuba)
+es-CU-ManuelNeural	Male	es-CU	Microsoft Manuel Online (Natural) - Spanish (Cuba)
+es-DO-EmilioNeural	Male	es-DO	Microsoft Emilio Online (Natural) - Spanish (Dominican Republic)
+es-DO-RamonaNeural	Female	es-DO	Microsoft Ramona Online (Natural) - Spanish (Dominican Republic)
+es-EC-AndreaNeural	Female	es-EC	Microsoft Andrea Online (Natural) - Spanish (Ecuador)
+es-EC-LuisNeural	Male	es-EC	Microsoft Luis Online (Natural) - Spanish (Ecuador)
+es-SV-LorenaNeural	Female	es-SV	Microsoft Lorena Online (Natural) - Spanish (El Salvador)
+es-SV-RodrigoNeural	Male	es-SV	Microsoft Rodrigo Online (Natural) - Spanish (El Salvador)
+es-GQ-JavierNeural	Male	es-GQ	Microsoft Javier Online (Natural) - Spanish (Equatorial Guinea)
+es-GQ-TeresaNeural	Female	es-GQ	Microsoft Teresa Online (Natural) - Spanish (Equatorial Guinea)
+es-GT-AndresNeural	Male	es-GT	Microsoft Andres Online (Natural) - Spanish (Guatemala)
+es-GT-MartaNeural	Female	es-GT	Microsoft Marta Online (Natural) - Spanish (Guatemala)
+es-HN-CarlosNeural	Male	es-HN	Microsoft Carlos Online (Natural) - Spanish (Honduras)
+es-HN-KarlaNeural	Female	es-HN	Microsoft Karla Online (Natural) - Spanish (Honduras)
+es-MX-DaliaNeural	Female	es-MX	Microsoft Dalia Online (Natural) - Spanish (Mexico)
+es-MX-JorgeNeural	Male	es-MX	Microsoft Jorge Online (Natural) - Spanish (Mexico)
+es-NI-FedericoNeural	Male	es-NI	Microsoft Federico Online (Natural) - Spanish (Nicaragua)
+es-NI-YolandaNeural	Female	es-NI	Microsoft Yolanda Online (Natural) - Spanish (Nicaragua)
+es-PA-MargaritaNeural	Female	es-PA	Microsoft Margarita Online (Natural) - Spanish (Panama)
+es-PA-RobertoNeural	Male	es-PA	Microsoft Roberto Online (Natural) - Spanish (Panama)
+es-PY-MarioNeural	Male	es-PY	Microsoft Mario Online (Natural) - Spanish (Paraguay)
+es-PY-TaniaNeural	Female	es-PY	Microsoft Tania Online (Natural) - Spanish (Paraguay)
+es-PE-AlexNeural	Male	es-PE	Microsoft Alex Online (Natural) - Spanish (Peru)
+es-PE-CamilaNeural	Female	es-PE	Microsoft Camila Online (Natural) - Spanish (Peru)
+es-PR-KarinaNeural	Female	es-PR	Microsoft Karina Online (Natural) - Spanish (Puerto Rico)
+es-PR-VictorNeural	Male	es-PR	Microsoft Victor Online (Natural) - Spanish (Puerto Rico)
+es-ES-AlvaroNeural	Male	es-ES	Microsoft Alvaro Online (Natural) - Spanish (Spain)
+es-ES-ElviraNeural	Female	es-ES	Microsoft Elvira Online (Natural) - Spanish (Spain)
+es-US-AlonsoNeural	Male	es-US	Microsoft Alonso Online (Natural) - Spanish (United States)
+es-US-PalomaNeural	Female	es-US	Microsoft Paloma Online (Natural) - Spanish (United States)
+es-UY-MateoNeural	Male	es-UY	Microsoft Mateo Online (Natural) - Spanish (Uruguay)
+es-UY-ValentinaNeural	Female	es-UY	Microsoft Valentina Online (Natural) - Spanish (Uruguay)
+es-VE-PaolaNeural	Female	es-VE	Microsoft Paola Online (Natural) - Spanish (Venezuela)
+es-VE-SebastianNeural	Male	es-VE	Microsoft Sebastian Online (Natural) - Spanish (Venezuela)
+ja-JP-KeitaNeural	Male	ja-JP	Microsoft Keita Online (Natural) - Japanese (Japan)
+ja-JP-NanamiNeural	Female	ja-JP	Microsoft Nanami Online (Natural) - Japanese (Japan)
+it-IT-GiuseppeMultilingualNeural	Male	it-IT	Microsoft GiuseppeMultilingual Online (Natural) - Italian (Italy)
+it-IT-DiegoNeural	Male	it-IT	Microsoft Diego Online (Natural) - Italian (Italy)
+it-IT-ElsaNeural	Female	it-IT	Microsoft Elsa Online (Natural) - Italian (Italy)
+it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian (Italy)`;
 
         const translations = {
             en: {
@@ -355,7 +492,10 @@
                 'status-label': "Status: ",
                 'preview-panel-heading': "Preview",
                 'preview-placeholder': "Type in the input area to see a preview.",
-                'log-heading': "Log"
+                'log-heading': "Log",
+                'gender-label': "Gender",
+                'language-label': "Language",
+                'voice-name-label': "Voice Name"
             },
             zh: {
                 title: "SnapDek Studio - Create Deks, In a Snap",
@@ -368,7 +508,10 @@
                 'status-label': "状态: ",
                 'preview-panel-heading': "预览",
                 'preview-placeholder': "在输入区域键入以查看预览。",
-                'log-heading': "日志"
+                'log-heading': "日志",
+                'gender-label': "性别",
+                'language-label': "语言",
+                'voice-name-label': "语音名称"
             }
         };
 
@@ -389,7 +532,6 @@
                     }
                 }
             });
-            // Update language switcher button text based on the *new* current language
             const langSwitcherButton = document.getElementById('language-switcher');
             if (lang === 'en') {
                 langSwitcherButton.textContent = translations.en['language-switcher']; 
@@ -403,17 +545,150 @@
             setLanguage(newLang);
         }
 
-        document.getElementById('language-switcher').addEventListener('click', toggleLanguage);
-
-        // Initial language setup on page load
-        setLanguage(currentLanguage);
-
         function log(message) {
             const logOutput = document.getElementById('logOutput');
             const timestamp = new Date().toLocaleTimeString();
             logOutput.textContent += `[${timestamp}] ${message}\n`;
-            logOutput.scrollTop = logOutput.scrollHeight; // Scroll to bottom
+            logOutput.scrollTop = logOutput.scrollHeight; 
         }
+
+        function parseVoiceData(text) {
+            const lines = text.trim().split('\n');
+            const voices = [];
+            const allowedLocales = [
+                'en-US', // 英语 (美国)
+                'en-GB', // 英语 (英国)
+                'de-DE', // 德语 (德国)
+                'fr-FR', // 法语 (法国)
+                'zh-CN', // 中文 (大陆)
+                'it-IT', // 意大利语 (意大利)
+                'es-ES', // 西班牙语 (西班牙)
+                'es-MX', // 西班牙语 (墨西哥) - 作为西班牙语的补充
+                'ja-JP'  // 日语 (日本)
+            ];
+
+            for (let i = 1; i < lines.length; i++) { 
+                const parts = lines[i].split('\t');
+                if (parts.length >= 4) {
+                    const shortName = parts[0];
+                    const gender = parts[1];
+                    const locale = parts[2]; 
+                    const friendlyName = parts[3];
+
+                    if (allowedLocales.includes(locale)) { 
+                        let personaName = shortName.split('-').pop();
+                        personaName = personaName.replace('Neural', '');
+                        personaName = personaName.replace('Multilingual', ''); 
+                        
+                        const langDescMatch = friendlyName.match(/ - (.*)$/);
+                        // 使用地区代码来唯一标识语言组，避免友好名称可能带来的歧义
+                        const languageGroupKey = locale; 
+                        const languageDisplay = langDescMatch ? langDescMatch[1] : locale;
+
+
+                        voices.push({ 
+                            shortName, 
+                            gender, 
+                            languageGroupKey, // 用于内部逻辑和排序
+                            languageDisplay,  // 用于显示给用户
+                            persona: personaName 
+                        });
+                    }
+                }
+            }
+            return voices;
+        }
+        
+        function populateLanguageSelect() {
+            const availableLanguages = [...new Set(parsedVoices.map(v => JSON.stringify({key: v.languageGroupKey, display: v.languageDisplay})))].map(str => JSON.parse(str));
+            
+            // 定义期望的语言顺序 (基于 languageGroupKey)
+            const desiredOrder = [
+                'en-US', 'en-GB', // 英语
+                'de-DE',          // 德语
+                'fr-FR',          // 法语
+                'zh-CN',          // 中文
+                'it-IT',          // 意大利语
+                'es-ES', 'es-MX', // 西班牙语
+                'ja-JP'           // 日语
+            ];
+
+            // 排序
+            availableLanguages.sort((a, b) => {
+                const indexA = desiredOrder.indexOf(a.key);
+                const indexB = desiredOrder.indexOf(b.key);
+
+                if (indexA === -1 && indexB === -1) return a.display.localeCompare(b.display); // 两者都不在期望顺序中，按显示名称字母排序
+                if (indexA === -1) return 1; // a不在，b在，b优先
+                if (indexB === -1) return -1; // b不在，a在，a优先
+                return indexA - indexB; // 都在，按期望顺序
+            });
+            
+            languageSelect.innerHTML = '';
+            availableLanguages.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.key; // 存储地区代码作为值
+                option.textContent = lang.display; // 显示友好的语言名称
+                languageSelect.appendChild(option);
+            });
+
+            if (availableLanguages.length > 0) {
+                languageSelect.value = availableLanguages[0].key; // 默认选中排序后的第一个
+            }
+            updateGenderOptions();
+        }
+
+
+        function updateGenderOptions() {
+            const selectedLanguageKey = languageSelect.value;
+            genderSelect.innerHTML = '';
+            voiceNameSelect.innerHTML = '';
+
+            if (!selectedLanguageKey) return;
+
+            const genders = [...new Set(
+                parsedVoices
+                    .filter(v => v.languageGroupKey === selectedLanguageKey)
+                    .map(v => v.gender)
+            )].sort();
+
+            genders.forEach(gender => {
+                const option = document.createElement('option');
+                option.value = gender;
+                option.textContent = gender;
+                genderSelect.appendChild(option);
+            });
+
+            if (genders.length > 0) {
+                const preferredGender = "Female";
+                if (genders.includes(preferredGender)) {
+                    genderSelect.value = preferredGender;
+                } else {
+                    genderSelect.value = genders[0];
+                }
+            }
+            updateVoiceNameOptions();
+        }
+
+        function updateVoiceNameOptions() {
+            const selectedLanguageKey = languageSelect.value;
+            const selectedGender = genderSelect.value;
+            voiceNameSelect.innerHTML = '';
+
+            if (!selectedLanguageKey || !selectedGender) return;
+
+            const voicePersonas = parsedVoices
+                .filter(v => v.languageGroupKey === selectedLanguageKey && v.gender === selectedGender)
+                .sort((a, b) => a.persona.localeCompare(b.persona));
+
+            voicePersonas.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.shortName;
+                option.textContent = voice.persona;
+                voiceNameSelect.appendChild(option);
+            });
+        }
+
 
         function removeParentheses(text) {
             return text.replace(/[（(][^）)]*?[)）]/g, '').trim();
@@ -427,8 +702,7 @@
             const fullInputText = textArea.value;
             const texts = fullInputText.split(/\n##\n/).map(t => t.trim()).filter(t => t.length > 0);
 
-            previewList.innerHTML = ''; // Clear previous preview items
-
+            previewList.innerHTML = ''; 
             let itemCount = 0;
 
             if (texts.length === 0) {
@@ -445,7 +719,7 @@
                     `;
                     previewList.appendChild(li);
                 } else {
-                     previewList.innerHTML = '<li><span class="file-content" style="color: #777; font-style: italic;">Type in the input area to see a preview.</span></li>';
+                     document.getElementById('previewPlaceholder').style.display = 'block';
                 }
             } else {
                 itemCount = texts.length;
@@ -463,16 +737,22 @@
             }
 
             if (itemCount > 0) {
-                previewTitleElement.textContent = `Preview (${itemCount} item${itemCount === 1 ? '' : 's'})`;
+                document.getElementById('previewPlaceholder').style.display = 'none';
+                const previewKey = 'preview-panel-heading';
+                const baseText = translations[currentLanguage] ? translations[currentLanguage][previewKey] : "Preview";
+                previewTitleElement.textContent = `${baseText} (${itemCount} item${itemCount === 1 ? '' : 's'})`;
+
             } else {
-                previewTitleElement.textContent = 'Preview';
+                 const previewKey = 'preview-panel-heading';
+                 previewTitleElement.textContent = translations[currentLanguage] ? translations[currentLanguage][previewKey] : "Preview";
+                 document.getElementById('previewPlaceholder').style.display = 'block';
             }
         }
         
         function playPreviewAudio(index) {
             if (generatedAudioData[index]) {
                 if (currentPreviewAudioUrl) {
-                    URL.revokeObjectURL(currentPreviewAudioUrl); // Revoke previous URL
+                    URL.revokeObjectURL(currentPreviewAudioUrl); 
                 }
                 currentPreviewAudioUrl = URL.createObjectURL(generatedAudioData[index]);
                 previewAudioPlayer.src = currentPreviewAudioUrl;
@@ -486,15 +766,10 @@
                 log(`No audio data found for preview item ${index + 1}`);
             }
         }
-
-        textArea.addEventListener('input', updatePreview);
-        document.addEventListener('DOMContentLoaded', updatePreview);
-
-        generateBtn.addEventListener('click', generateAudio);
-
+        
         async function generateAudio() {
-            generatedAudioData = {}; // Reset stored audio for this batch
-            if (currentPreviewAudioUrl) { // Stop any playing preview and revoke its URL
+            generatedAudioData = {}; 
+            if (currentPreviewAudioUrl) { 
                 previewAudioPlayer.pause();
                 URL.revokeObjectURL(currentPreviewAudioUrl);
                 currentPreviewAudioUrl = null;
@@ -503,7 +778,7 @@
             zip = new JSZip();
             const fullInputText = textArea.value;
             log(`Starting generation process.`);
-            updatePreview(); // Ensure preview is rebuilt cleanly without old icons/listeners
+            updatePreview(); 
 
             const texts = fullInputText.split(/\n##\n/).map(t => t.trim()).filter(t => t.length > 0);
             
@@ -518,6 +793,12 @@
             }
             log(`Number of entries to process: ${texts.length}`);
 
+            if (!voiceNameSelect.value) {
+                alert('Please select a voice.');
+                log('No voice selected for generation.');
+                return;
+            }
+
             generateBtn.disabled = true;
             downloadBtn.style.display = 'none';
             progressDiv.style.display = 'block';
@@ -527,11 +808,11 @@
             for (let i = 0; i < texts.length; i++) {
                 const originalEntryText = texts[i]; 
                 const audioText = removeParentheses(originalEntryText); 
-                const voice = voiceSelect.value;
+                const voice = voiceNameSelect.value; 
                 const fileNameBase = `${(i + 1).toString().padStart(3, '0')}`;
 
                 statusSpan.textContent = `Generating ${i + 1}/${texts.length}: ${fileNameBase}`;
-                log(`Processing entry ${i + 1}/${texts.length}. Text for audio: "${audioText.substring(0, 50)}..."`);
+                log(`Processing entry ${i + 1}/${texts.length}. Text for audio: "${audioText.substring(0, 50)}..." Voice: ${voice}`);
 
                 const currentPreviewItemLi = previewList.querySelector(`li[data-index="${i}"]`);
 
@@ -539,7 +820,6 @@
                     log(`Skipping entry ${i + 1} as text for audio is empty after removing parentheses.`);
                     zip.file(`${fileNameBase}.txt`, originalEntryText);
                     log(`Created ${fileNameBase}.txt (original content) for skipped audio.`);
-                    // No audio icon for skipped items
                 } else {
                     try {
                         const response = await fetch(apiUrl, {
@@ -554,19 +834,18 @@
                         }
 
                         const blob = await response.blob();
-                        generatedAudioData[i] = blob; // Store blob for preview
+                        generatedAudioData[i] = blob; 
                         zip.file(`${fileNameBase}.mp3`, blob);
                         zip.file(`${fileNameBase}.txt`, originalEntryText);
 
                         log(`Successfully generated ${fileNameBase}.mp3 and ${fileNameBase}.txt`);
 
-                        // Update UI for playback
                         if (currentPreviewItemLi) {
                             const iconPlaceholder = currentPreviewItemLi.querySelector('.audio-icon-placeholder');
                             const contentDiv = currentPreviewItemLi.querySelector('.file-content');
 
                             if (iconPlaceholder) {
-                                iconPlaceholder.innerHTML = '&#128266;'; // Speaker icon 
+                                iconPlaceholder.innerHTML = '&#128266;'; 
                                 iconPlaceholder.classList.add('active');
                                 iconPlaceholder.title = `Play preview for item ${i + 1}`;
                                 iconPlaceholder.onclick = (e) => { e.stopPropagation(); playPreviewAudio(i); };
@@ -609,6 +888,9 @@
             return `${M}${D}_${H}${m}${s}`;
         }
 
+        languageSwitcher.addEventListener('click', toggleLanguage);
+        textArea.addEventListener('input', updatePreview);
+        generateBtn.addEventListener('click', generateAudio);
         downloadBtn.addEventListener('click', async () => {
             if (Object.keys(zip.files).length === 0) {
                 alert("No files to download. Please generate audio first or check if inputs were valid.");
@@ -627,6 +909,17 @@
                 alert("Error creating DEK file. Check console for details.");
             }
         });
+
+        languageSelect.addEventListener('change', updateGenderOptions);
+        genderSelect.addEventListener('change', updateVoiceNameOptions);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            parsedVoices = parseVoiceData(voiceDataText);
+            populateLanguageSelect(); //  首先填充语言，然后性别，然后语音名称
+            setLanguage(currentLanguage); 
+            updatePreview(); 
+        });
+
     </script>
 </body>
 </html>
