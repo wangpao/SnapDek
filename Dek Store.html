@@ -15,10 +15,9 @@
             --button-bg-color: #f8f9fa;
             --button-hover-bg-color: #e9ecef;
             --theme-switcher-bg: #e9ecef;
-            --theme-switcher-button-active-bg: #fff;
+            --theme-switcher-button-active-bg: #fff; /* 之前用于单个激活按钮，现在可以简化 */
             --theme-switcher-icon-color: #555;
-            --theme-switcher-icon-active-color: #007bff;
-            --popular-item-bg: #FF7F7F;
+            /* --theme-switcher-icon-active-color: #007bff; */ /* 现在只有一个图标显示 */
             --search-tab-bg: #fff;
             --search-tab-border: #dee2e6;
             --search-tab-text: #495057;
@@ -39,8 +38,7 @@
             --theme-switcher-bg: #343a40;
             --theme-switcher-button-active-bg: #495057;
             --theme-switcher-icon-color: #adb5bd;
-            --theme-switcher-icon-active-color: #f8f9fa;
-            --popular-item-bg: #B22222;
+            /* --theme-switcher-icon-active-color: #f8f9fa; */
             --search-tab-bg: #343a40;
             --search-tab-border: #495057;
             --search-tab-text: #f8f9fa;
@@ -69,75 +67,53 @@
 
         .top-bar {
             display: flex;
-            justify-content: space-between; /* 默认两端对齐 */
+            justify-content: space-between;
             align-items: center;
             padding: 8px 0;
             margin-bottom: 20px;
-            flex-wrap: wrap; /* 允许子元素换行 */
-            gap: 10px; /* 在换行时，元素之间增加一些间隙 */
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        .language-switcher {
-            display: flex;
-            align-items: center;
+        .language-switcher { /* 修改为按钮样式 */
             cursor: pointer;
-            padding: 5px 8px;
+            padding: 6px 12px; /* 调整内边距使其更像按钮 */
             border-radius: 4px;
-            background: none;
-            border: none;
-            color: var(--secondary-text-color);
-            /* order: 1; /* 如果需要明确顺序 */
+            background-color: var(--button-bg-color); /* 使用按钮背景色 */
+            border: 1px solid var(--border-color);   /* 添加边框 */
+            color: var(--text-color); /* 文字颜色与普通按钮一致 */
+            font-size: 0.875rem;
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
         }
         .language-switcher:hover {
             background-color: var(--button-hover-bg-color);
+            border-color: var(--border-color); /* 悬停时边框颜色可以调整，或保持不变 */
         }
-        .language-switcher .lang-icon {
-            width: 18px;
-            height: 18px;
-            margin-right: 5px;
-            fill: var(--secondary-text-color);
-        }
-        .language-switcher .current-lang-text {
-            font-size: 0.875rem;
-            margin-right: 3px;
-        }
-        .language-switcher .dropdown-arrow {
-            width: 10px;
-            height: 10px;
-            fill: var(--secondary-text-color);
-        }
+        /* .language-switcher .lang-icon, .language-switcher .dropdown-arrow -- 已移除 */
 
-        .theme-switcher {
+        .theme-switcher-container { /* 新增容器，用于点击切换 */
             display: flex;
             align-items: center;
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2px;
+            border-radius: 20px; /* 保持圆角 */
+            padding: 4px; /* 轻微调整内边距 */
             background-color: var(--theme-switcher-bg);
-            /* order: 2; /* 如果需要明确顺序 */
-        }
-        .theme-switcher button {
-            background: none;
-            border: none;
             cursor: pointer;
-            padding: 5px 7px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: background-color 0.15s ease-in-out;
         }
-        .theme-switcher button.active {
-            background-color: var(--theme-switcher-button-active-bg);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        .theme-switcher-container:hover {
+            background-color: var(--button-hover-bg-color); /* 悬停效果 */
         }
-        .theme-switcher button svg {
-            width: 16px;
-            height: 16px;
-            fill: var(--theme-switcher-icon-color);
+
+        .theme-switcher-container svg {
+            width: 18px; /* SVG图标大小 */
+            height: 18px;
+            stroke: var(--theme-switcher-icon-color);
+            fill: none;
+            display: block; /* 确保SVG正确显示 */
         }
-        .theme-switcher button.active svg {
-            fill: var(--theme-switcher-icon-active-color);
-        }
+        /* .theme-switcher-container .sun-icon, .theme-switcher-container .moon-icon -- JS会控制显示哪个 */
+
 
         .hero-section {
             text-align: center;
@@ -171,20 +147,7 @@
         .search-section {
             margin-bottom: 30px;
         }
-        .search-tabs .tab {
-            display: inline-block;
-            padding: 7px 12px;
-            background-color: var(--search-tab-bg);
-            border: 1px solid var(--search-tab-border);
-            border-bottom: none;
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
-            font-size: 0.9375rem;
-            color: var(--search-tab-text);
-            position: relative;
-            top: 1px;
-            margin-left: 15px;
-        }
+
         .search-form {
             display: flex;
             border: 1px solid var(--border-color);
@@ -221,7 +184,6 @@
             color: var(--secondary-text-color);
             text-decoration: none;
             border-bottom: 1px dashed var(--secondary-text-color);
-            margin-left: 15px;
             display: inline-block;
             margin-top: 8px;
         }
@@ -237,44 +199,44 @@
         }
         .popular-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 15px;
         }
         .popular-item {
-            background-color: var(--popular-item-bg);
-            height: 250px;
+            aspect-ratio: 1 / 1;
             border-radius: 4px;
+            overflow: hidden;
         }
+        .popular-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
 
         @media (max-width: 768px) {
             .container { padding: 10px; }
             .hero-section h1 { font-size: 2rem; }
             .hero-section .subtitle { font-size: 0.9375rem; }
-            .popular-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-            .popular-item { height: 200px; }
-            .search-tabs .tab { margin-left: 5px; padding: 6px 10px; font-size: 0.875rem; }
+            .popular-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
             .search-form input[type="text"], .search-form button { font-size: 0.9375rem; padding: 8px 10px;}
-            .search-options a { margin-left: 5px; font-size: 0.8125rem;}
-            /* .top-bar { flex-direction: column; gap: 10px; align-items: flex-start; }  Removed this to test new logic */
+            .search-options a { margin-left: 0; font-size: 0.8125rem;}
             .popular-section h2 { font-size: 1.25rem; }
         }
 
-        /* Refined media query for top-bar wrapping behavior */
-        @media (max-width: 420px) { /* Adjust this breakpoint as needed */
+        @media (max-width: 420px) { /* 保持这个断点用于top-bar的右对齐 */
             .top-bar {
-                 /* When items wrap, we want them to start from the left by default in their new line */
                 justify-content: flex-start;
             }
-            .theme-switcher {
-                margin-left: auto; /* This pushes the theme switcher to the right on its line */
-                 /* If you want it to take full width on its new line and then align its content right:
-                 width: 100%;
-                 display: flex;
-                 justify-content: flex-end;
-                 margin-left: 0; /* Reset margin-left if using width: 100% */
+            .theme-switcher-container { /* 主题切换器在新行时右对齐 */
+                margin-left: auto;
             }
-            .popular-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-            .popular-item { height: 180px; }
+            .popular-grid {
+                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
             .hero-section h1 { font-size: 1.75rem; }
             .hero-section .subtitle { font-size: 0.875rem; }
         }
@@ -284,28 +246,26 @@
     <div class="container">
         <header class="top-bar">
             <button class="language-switcher" id="languageSwitcherBtn">
-                <svg class="lang-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7.6 5.8H5V4H11.8V5.8H9.2V14H7.6V5.8ZM13.4 11.3C13.4 10.1 13.74 9.09999 14.42 8.29999C15.1 7.49999 16 7.09999 17.1 7.09999C18.2 7.09999 19.08 7.49999 19.76 8.29999C20.44 9.09999 20.78 10.1 20.78 11.3C20.78 12.5 20.44 13.5 19.76 14.3C19.08 15.1 18.2 15.5 17.1 15.5C16 15.5 15.1 15.1 14.42 14.3C13.74 13.5 13.4 12.5 13.4 11.3ZM15.12 11.3C15.12 12.1 15.32 12.74 15.72 13.22C16.12 13.7 16.58 13.94 17.1 13.94C17.62 13.94 18.08 13.7 18.48 13.22C18.88 12.74 19.08 12.1 19.08 11.3C19.08 10.5 18.88 9.85999 18.48 9.37999C18.08 8.89999 17.62 8.65999 17.1 8.65999C16.58 8.65999 16.12 8.89999 15.72 9.37999C15.32 9.85999 15.12 10.5 15.12 11.3Z" fill="currentColor"/>
-                    <rect x="3" y="17" width="18" height="1.5" fill="currentColor"/>
-                    <path d="M19 20H5C4.44772 20 4 19.5523 4 19V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V19C20 19.5523 19.5523 20 19 20ZM5 3.5V18.5H19V3.5H5Z" fill="currentColor"/>
-                </svg>
-                <span class="current-lang-text" id="currentLangText">English</span>
-                <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <span id="currentLangText">English</span>
             </button>
 
-            <div class="theme-switcher">
-                <button id="lightThemeBtn" class="active" aria-label="Light theme">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 3.5c-4.68 0-8.5 3.82-8.5 8.5s3.82 8.5 8.5 8.5 8.5-3.82 8.5-8.5S16.68 3.5 12 3.5zm0 15c-3.58 0-6.5-2.92-6.5-6.5s2.92-6.5 6.5-6.5 6.5 2.92 6.5 6.5-2.92 6.5-6.5 6.5zM12 6c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1s1 .45 1 1v2c0 .55-.45 1-1 1zm0 14c.55 0 1 .45 1 1v2c0 .55-.45 1-1 1s-1-.45-1-1v-2c0-.55.45-1 1-1zm-6.36-3.28c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.2.2.45.29.71.29s.51-.1.71-.29l1.41-1.41c.39-.39.39-1.02 0-1.41zm10.18 2.82c.2.2.45.29.71.29s.51-.1.71-.29l1.41-1.41c.39-.39.39-1.02 0-1.41s-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41zM21 11h-2c-.55 0-1 .45-1 1s.45 1 1 1h2c.55 0 1-.45 1-1s-.45-1-1-1zm-18 0H1c-.55 0-1 .45-1 1s.45 1 1 1h2c.55 0 1-.45 1-1s-.45-1-1-1zm7.78-6.36c.39-.39.39-1.02 0-1.41L9.36 1.82c-.39-.39-1.02-.39-1.41 0s-.39 1.02 0 1.41l1.41 1.41c.2.2.45.29.71.29s.51-.1.71-.29zm2.83 10.18l1.41 1.41c.2.2.45.29.71.29s.51-.1.71-.29l1.41-1.41c.39-.39.39-1.02 0-1.41s-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41z"/>
-                    </svg>
-                </button>
-                <button id="darkThemeBtn" aria-label="Dark theme">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z"/>
-                    </svg>
-                </button>
+            <div class="theme-switcher-container" id="themeSwitcherContainer">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2"></path>
+                    <path d="M12 20v2"></path>
+                    <path d="m4.93 4.93 1.41 1.41"></path>
+                    <path d="m17.66 17.66 1.41 1.41"></path>
+                    <path d="M2 12h2"></path>
+                    <path d="M20 12h2"></path>
+                    <path d="m6.34 17.66-1.41 1.41"></path>
+                    <path d="m19.07 4.93-1.41 1.41"></path>
+                </svg>
+                <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9"></path>
+                    <path d="M20 3v4"></path>
+                    <path d="M22 5h-4"></path>
+                </svg>
             </div>
         </header>
 
@@ -323,9 +283,6 @@
         </section>
 
         <section class="search-section">
-            <div class="search-tabs">
-                <span class="tab active" data-lang-key="general_search_tab">General Search</span>
-            </div>
             <form class="search-form" action="#" method="get">
                 <input type="text" name="q" id="searchInput" placeholder="Search for Deks" data-lang-key="search_placeholder_deks">
                 <button type="submit" data-lang-key="search_button">Search</button>
@@ -338,18 +295,29 @@
         <section class="popular-section">
             <h2 data-lang-key="most_popular_title">Most Popular</h2>
             <div class="popular-grid">
-                <div class="popular-item"></div>
-                <div class="popular-item"></div>
-                <div class="popular-item"></div>
-                <div class="popular-item"></div>
-                <div class="popular-item"></div>
+                <div class="popular-item">
+                    <img src="https://i.scdn.co/image/ab67616d00001e025d7988b9154f5fac80ed1d39" alt="Popular Item 1">
+                </div>
+                <div class="popular-item">
+                    <img src="https://i.scdn.co/image/ab67616d00001e02258f26eb6ce7851a80fcf3df" alt="Popular Item 2">
+                </div>
+                <div class="popular-item">
+                    <img src="https://i.scdn.co/image/ab67616d00001e02c8b444df094279e70d0ed856" alt="Popular Item 3">
+                </div>
+                <div class="popular-item">
+                    <img src="https://i.scdn.co/image/ab67616d00001e024f13783ebca8686ddc7992e7" alt="Popular Item 4">
+                </div>
+                <div class="popular-item">
+                    <img src="https://i.scdn.co/image/ab67616d00001e02258f26eb6ce7851a80fcf3df" alt="Popular Item 5">
+                </div>
             </div>
         </section>
     </div>
 
     <script>
-        const lightThemeBtn = document.getElementById('lightThemeBtn');
-        const darkThemeBtn = document.getElementById('darkThemeBtn');
+        const themeSwitcherContainer = document.getElementById('themeSwitcherContainer');
+        const sunIcon = themeSwitcherContainer.querySelector('.sun-icon');
+        const moonIcon = themeSwitcherContainer.querySelector('.moon-icon');
         const languageSwitcherBtn = document.getElementById('languageSwitcherBtn');
         const currentLangTextEl = document.getElementById('currentLangText');
         const htmlEl = document.documentElement;
@@ -358,7 +326,6 @@
             en: {
                 current_lang_display: "English",
                 subtitle: "Learn in a Snap",
-                general_search_tab: "General Search",
                 search_placeholder_deks: "Search for Deks",
                 search_button: "Search",
                 search_options_link: "Search options",
@@ -367,7 +334,6 @@
             zh: {
                 current_lang_display: "中文",
                 subtitle: "轻松学习",
-                general_search_tab: "常规搜索",
                 search_placeholder_deks: "搜索Deks",
                 search_button: "搜索",
                 search_options_link: "搜索选项",
@@ -393,18 +359,21 @@
         function setTheme(theme) {
             if (theme === 'dark') {
                 htmlEl.classList.add('dark-mode');
-                darkThemeBtn.classList.add('active');
-                lightThemeBtn.classList.remove('active');
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
             } else {
                 htmlEl.classList.remove('dark-mode');
-                lightThemeBtn.classList.add('active');
-                darkThemeBtn.classList.remove('active');
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
             }
             localStorage.setItem('theme', theme);
         }
 
-        lightThemeBtn.addEventListener('click', () => setTheme('light'));
-        darkThemeBtn.addEventListener('click', () => setTheme('dark'));
+        themeSwitcherContainer.addEventListener('click', () => {
+            const currentTheme = htmlEl.classList.contains('dark-mode') ? 'dark' : 'light';
+            const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(nextTheme);
+        });
 
         function setLanguage(lang) {
             applyTranslations(lang);
@@ -419,7 +388,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
-            setTheme(savedTheme);
+            setTheme(savedTheme); // This will also set the correct icon visibility
 
             const savedLanguage = localStorage.getItem('language') || 'en';
             setLanguage(savedLanguage);
