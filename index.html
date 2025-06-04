@@ -53,6 +53,18 @@
             --fab-icon-size: 18px;
         }
 
+        #sidebar-title {
+            font-size: 1.5em; /* Adjust as needed */
+            font-weight: bold;
+            margin-left: 10px; /* Space between logo and title */
+            color: var(--sidebar-actual-text); /* Use existing CSS variable for text color */
+            display: inline-block; /* Allows margin and keeps it on the same line */
+            vertical-align: middle; /* Aligns text vertically with the logo if needed */
+        }
+        #sidebar-logo-container svg {
+            vertical-align: middle; /* Ensure SVG aligns with the text */
+        }
+
         body.page-dark-theme {
             --background-color: #121212;
             --text-color: #E0E0E0;
@@ -333,6 +345,7 @@
                     <rect x="5" y="13.572" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 13.572)" fill="#FFBC00"/>
                     <rect x="5" y="19.8439" width="14.4993" height="4.79895" rx="2.39947" transform="rotate(-30 5 19.8439)" fill="#F5EC00"/>
                 </svg>
+                <span id="sidebar-title">SnapDek</span>
             </div>
             <label for="dekFileUploadInputSidebar" class="upload-button-label-sidebar">Upload new dek</label>
             <input type="file" id="dekFileUploadInputSidebar" style="display: none;" accept=".dek">
