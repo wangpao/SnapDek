@@ -297,7 +297,10 @@
             <select id="voiceNameSelect"></select>
 
             <button id="generate" data-translate-key="generate-button">Generate Audio & TXT Files</button>
-            <button id="download" style="display: none;" data-translate-key="download-button">Download Dek</button>
+            <div id="action-buttons-container" style="display: none; width: 100%; display: flex; gap: 10px; flex-direction: row;">
+                 <button id="download" data-translate-key="download-button" style="flex-grow: 1; margin-bottom: 0;">Download Dek</button>
+                 <button id="publishBtn" data-translate-key="publish-button" style="flex-grow: 1; margin-bottom: 0;">Publish to Dek Store</button>
+            </div>
             <div id="progress" style="display: none;">
                 <p><span data-translate-key="status-label">Status: </span><span id="status">Waiting</span></p>
                 <progress id="progressBar" value="0" max="100" style="width: 100%;"></progress>
@@ -324,6 +327,7 @@
         const apiUrl = 'https://oopstts.vercel.app/azure/tts';
         const generateBtn = document.getElementById('generate');
         const downloadBtn = document.getElementById('download');
+        const actionButtonsContainer = document.getElementById('action-buttons-container');
         const textArea = document.getElementById('text');
         
         const languageSelect = document.getElementById('languageSelect');
@@ -489,6 +493,7 @@ it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian 
                 'input-placeholder': "Enter your text here. Separate multiple entries with '##' on a new line. Text in (parentheses) or （full-width parentheses） will be used for audio generation but shown highlighted (without parentheses) in preview.",
                 'generate-button': "Generate Audio & TXT Files",
                 'download-button': "Download Dek",
+                'publish-button': "Publish to Dek Store",
                 'status-label': "Status: ",
                 'preview-panel-heading': "Preview",
                 'preview-placeholder': "Type in the input area to see a preview.",
@@ -505,6 +510,7 @@ it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian 
                 'input-placeholder': "在此输入文本。用新行上的“##”分隔多个条目。括号 () 或 （全角括号）中的文本将用于音频生成，但会在预览中突出显示（不带括号）。",
                 'generate-button': "生成音频和TXT文件",
                 'download-button': "下载Dek",
+                'publish-button': "发布到 Dek Store",
                 'status-label': "状态: ",
                 'preview-panel-heading': "预览",
                 'preview-placeholder': "在输入区域键入以查看预览。",
@@ -800,7 +806,7 @@ it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian 
             }
 
             generateBtn.disabled = true;
-            downloadBtn.style.display = 'none';
+            actionButtonsContainer.style.display = 'none';
             progressDiv.style.display = 'block';
             statusSpan.textContent = 'Preparing...';
             progressBar.value = 0;
@@ -871,7 +877,7 @@ it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian 
             log('All entries processed. DEK file ready for download if any files were generated.');
             generateBtn.disabled = false;
             if (Object.keys(zip.files).length > 0) {
-                downloadBtn.style.display = 'block';
+                actionButtonsContainer.style.display = 'flex';
             } else {
                 log('No files were generated.');
                  statusSpan.textContent = 'Generation complete (no files to download).';
