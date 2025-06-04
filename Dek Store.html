@@ -15,9 +15,8 @@
             --button-bg-color: #f8f9fa;
             --button-hover-bg-color: #e9ecef;
             --theme-switcher-bg: #e9ecef;
-            --theme-switcher-button-active-bg: #fff; /* 之前用于单个激活按钮，现在可以简化 */
+            --theme-switcher-button-active-bg: #fff;
             --theme-switcher-icon-color: #555;
-            /* --theme-switcher-icon-active-color: #007bff; */ /* 现在只有一个图标显示 */
             --search-tab-bg: #fff;
             --search-tab-border: #dee2e6;
             --search-tab-text: #495057;
@@ -38,7 +37,6 @@
             --theme-switcher-bg: #343a40;
             --theme-switcher-button-active-bg: #495057;
             --theme-switcher-icon-color: #adb5bd;
-            /* --theme-switcher-icon-active-color: #f8f9fa; */
             --search-tab-bg: #343a40;
             --search-tab-border: #495057;
             --search-tab-text: #f8f9fa;
@@ -75,45 +73,42 @@
             gap: 10px;
         }
 
-        .language-switcher { /* 修改为按钮样式 */
+        .language-switcher {
             cursor: pointer;
-            padding: 6px 12px; /* 调整内边距使其更像按钮 */
+            padding: 6px 12px;
             border-radius: 4px;
-            background-color: var(--button-bg-color); /* 使用按钮背景色 */
-            border: 1px solid var(--border-color);   /* 添加边框 */
-            color: var(--text-color); /* 文字颜色与普通按钮一致 */
+            background-color: var(--button-bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
             font-size: 0.875rem;
             transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
         }
         .language-switcher:hover {
             background-color: var(--button-hover-bg-color);
-            border-color: var(--border-color); /* 悬停时边框颜色可以调整，或保持不变 */
+            border-color: var(--border-color);
         }
-        /* .language-switcher .lang-icon, .language-switcher .dropdown-arrow -- 已移除 */
 
-        .theme-switcher-container { /* 新增容器，用于点击切换 */
+        .theme-switcher-container {
             display: flex;
             align-items: center;
             border: 1px solid var(--border-color);
-            border-radius: 20px; /* 保持圆角 */
-            padding: 4px; /* 轻微调整内边距 */
+            border-radius: 20px;
+            padding: 4px;
             background-color: var(--theme-switcher-bg);
             cursor: pointer;
             transition: background-color 0.15s ease-in-out;
         }
         .theme-switcher-container:hover {
-            background-color: var(--button-hover-bg-color); /* 悬停效果 */
+            background-color: var(--button-hover-bg-color);
         }
 
         .theme-switcher-container svg {
-            width: 18px; /* SVG图标大小 */
+            width: 18px;
             height: 18px;
             stroke: var(--theme-switcher-icon-color);
             fill: none;
-            display: block; /* 确保SVG正确显示 */
+            display: block;
         }
-        /* .theme-switcher-container .sun-icon, .theme-switcher-container .moon-icon -- JS会控制显示哪个 */
-
 
         .hero-section {
             text-align: center;
@@ -200,45 +195,424 @@
         .popular-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
+            gap: 20px;
         }
+
         .popular-item {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .popular-item-image-wrapper {
+            position: relative;
             aspect-ratio: 1 / 1;
             border-radius: 4px;
             overflow: hidden;
+            margin-bottom: 8px;
         }
-        .popular-item img {
+
+        .popular-item-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+         .popular-item:hover .popular-item-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .popular-item-overlay {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: rgba(20, 20, 20, 0.75);
+            border-radius: 20px;
+            padding: 5px 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, transform 0.2s ease-in-out;
+            z-index: 10;
+        }
+
+        .popular-item-image-wrapper:hover .popular-item-overlay {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            line-height: 0;
+        }
+
+        .action-btn .icon-svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+            transition: fill 0.2s ease;
+        }
+        .action-btn:hover .icon-svg {
+            fill: #cccccc;
+        }
+
+        .popular-item-info {
+            text-align: left;
+        }
+
+        .item-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-color);
+            margin: 0 0 3px 0;
+            line-height: 1.3;
+        }
+
+        .item-author {
+            font-size: 0.825rem;
+            color: var(--secondary-text-color);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        /* Modal Styles Updated */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background-color: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        html.dark-mode .modal {
+             background-color: rgba(10,10,10,0.85);
+        }
+
+        .modal-content {
+            padding: 0;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            text-align: left;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        html.dark-mode .modal-content {
+            background-color: #282828; /* Screenshot modal background */
+            border-color: #404040;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+        html:not(.dark-mode) .modal-content {
+            background-color: var(--bg-color);
+        }
+
+
+        .modal-close-button {
+            color: #aaa;
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            z-index: 2; /* Above backdrop and content in header */
+        }
+        .modal-close-button:hover,
+        .modal-close-button:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        html:not(.dark-mode) .modal-close-button {
+            color: var(--secondary-text-color);
+        }
+        html:not(.dark-mode) .modal-close-button:hover,
+        html:not(.dark-mode) .modal-close-button:focus {
+            color: var(--text-color);
+        }
+
+        .modal-header {
+            display: flex;
+            padding: 20px 20px 15px 20px;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            color: #fff; /* Default text color for header content on dark/blurred bg */
+        }
+        
+        .modal-image-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(25px) brightness(0.5) saturate(1.2);
+            transform: scale(1.15); /* Scale slightly more to ensure blur covers edges */
+        }
+        html:not(.dark-mode) .modal-header {
+            background-color: var(--bg-color); /* Fallback for light mode */
+            color: var(--text-color);
+        }
+        html:not(.dark-mode) .modal-image-backdrop {
+            /* Optionally, a different filter or display:none for light mode */
+             filter: blur(20px) brightness(0.9) saturate(1.1);
+        }
+
+        .modal-image-container, .modal-info { /* content on top of backdrop */
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-image-container {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .modal-image-container img#modalDekImage {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
 
+        .modal-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        html:not(.dark-mode) .modal-info { /* Ensure text is readable in light mode header */
+            color: var(--text-color);
+        }
+
+
+        .modal-title-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .country-flag-icon {
+            width: 20px;
+            height: 15px;
+            border-radius: 3px; /* Slightly more rounded to match screenshot */
+            object-fit: cover;
+            /* border: 1px solid rgba(0,0,0,0.1); Removed, screenshot doesn't show border */
+        }
+
+        #modalDekTitle {
+            font-size: 1.15rem; /* Approx from screenshot */
+            font-weight: bold; /* Screenshot title is bold */
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .modal-author, .modal-date {
+            font-size: 0.8rem; /* Approx from screenshot */
+            margin: 2px 0;
+            line-height: 1.4;
+            opacity: 0.85; /* Slightly less transparent text for better readability on dark bg */
+        }
+        /* Text color for author/date is inherited from .modal-header (white on dark mode) */
+         html:not(.dark-mode) .modal-author, html:not(.dark-mode) .modal-date {
+            color: var(--secondary-text-color);
+            opacity: 1;
+        }
+
+
+        .modal-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 10px 20px 15px 20px;
+        }
+        /* Background for actions area is same as modal-content background */
+        /* html.dark-mode .modal-actions { background-color: #282828; } */
+        /* html:not(.dark-mode) .modal-actions { background-color: var(--bg-color); } */
+
+
+        .modal-actions .action-btn {
+            padding: 5px;
+        }
+        .modal-actions .action-btn .icon-svg {
+            width: 24px; /* Slightly larger icons */
+            height: 24px;
+            fill: var(--secondary-text-color);
+        }
+        html.dark-mode .modal-actions .action-btn .icon-svg {
+            fill: #b3b3b3;
+        }
+
+        .modal-actions .action-btn:hover .icon-svg {
+            fill: var(--text-color);
+        }
+        html.dark-mode .modal-actions .action-btn:hover .icon-svg {
+            fill: #fff;
+        }
+
+        .modal-actions .modal-more-btn {
+            margin-left: auto;
+        }
+
+        .modal-card-content-separator {
+            padding: 12px 20px 8px 20px; /* Adjusted padding */
+            font-size: 0.75rem; /* Smaller text for separator */
+            font-weight: bold;
+            color: var(--secondary-text-color);
+            border-top: 1px solid var(--border-color);
+            text-transform: uppercase; /* As in some UI styles for separators */
+        }
+        html.dark-mode .modal-card-content-separator {
+            color: #888; /* Lighter grey for separator text in dark mode */
+            border-top: 1px solid #404040;
+        }
+        .modal-card-content-separator span {
+            letter-spacing: 0.5px;
+        }
+
+
+        .modal-card-list {
+            padding: 0 20px 20px 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        html.dark-mode .modal-card-list {
+            background-color: #1e1e1e; /* Darker bg for list area */
+        }
+        html:not(.dark-mode) .modal-card-list {
+            background-color: var(--bg-color); /* Consistent with content bg */
+        }
+
+
+        .card-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px; /* More rounded cards */
+        }
+        .card-item:last-child {
+            margin-bottom: 0;
+        }
+        html.dark-mode .card-item {
+            background-color: #333333; /* Card background from screenshot */
+            color: #e0e0e0;
+        }
+        html:not(.dark-mode) .card-item {
+             background-color: var(--button-bg-color); /* Light mode card bg */
+        }
+
+
+        .card-item p {
+            margin: 0 0 5px 0;
+            line-height: 1.5;
+        }
+        .card-item p:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-text-en {
+            font-size: 0.9rem;
+            margin-bottom: 8px !important; /* Ensure space before ZH text */
+        }
+        html.dark-mode .card-text-en {
+            color: #f0f0f0;
+        }
+        html:not(.dark-mode) .card-text-en {
+            color: var(--text-color);
+        }
+
+        .card-text-zh {
+            font-size: 0.9rem;
+            padding: 6px 10px;
+            border-radius: 6px; /* Match card rounding */
+            display: inline-block;
+            background-color: #8a63d233; /* Adjusted purple: lighter base, less opacity */
+            color: #774bbc;  /* Adjusted purple text color */
+        }
+        html.dark-mode .card-text-zh {
+            background-color: #583787; /* Darker purple highlight for dark mode, as per screenshot */
+            color: #d1b3f0; /* Lighter purple text for dark mode */
+        }
+
+        @media (max-height: 700px) { /* Adjust breakpoint based on typical content length */
+            .modal-content {
+                max-height: 90vh;
+            }
+             .modal-card-list {
+                max-height: 200px; /* Reduce max height on smaller viewports */
+            }
+        }
 
         @media (max-width: 768px) {
             .container { padding: 10px; }
             .hero-section h1 { font-size: 2rem; }
             .hero-section .subtitle { font-size: 0.9375rem; }
             .popular-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 15px;
             }
             .search-form input[type="text"], .search-form button { font-size: 0.9375rem; padding: 8px 10px;}
             .search-options a { margin-left: 0; font-size: 0.8125rem;}
             .popular-section h2 { font-size: 1.25rem; }
+            .item-title { font-size: 0.9rem; }
+            .item-author { font-size: 0.75rem; }
         }
 
-        @media (max-width: 420px) { /* 保持这个断点用于top-bar的右对齐 */
+        @media (max-width: 420px) {
             .top-bar {
                 justify-content: flex-start;
             }
-            .theme-switcher-container { /* 主题切换器在新行时右对齐 */
+            .theme-switcher-container {
                 margin-left: auto;
             }
             .popular-grid {
-                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                 grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
             }
             .hero-section h1 { font-size: 1.75rem; }
             .hero-section .subtitle { font-size: 0.875rem; }
+            .item-title { font-size: 0.85rem; }
+            .item-author { font-size: 0.7rem; }
+             .modal-content {
+                max-width: 95%; /* Allow modal to be wider on small screens */
+            }
+            .modal-header { padding: 15px; gap: 10px;}
+            .modal-image-container { width: 80px; height: 80px;}
+            #modalDekTitle { font-size: 1rem; }
+            .modal-author, .modal-date { font-size: 0.75rem; }
+            .modal-actions { padding: 8px 15px 12px 15px; gap: 12px;}
+            .modal-actions .action-btn .icon-svg { width: 22px; height: 22px;}
+            .modal-card-content-separator { padding: 10px 15px 6px 15px; }
+            .modal-card-list { padding: 0 15px 15px 15px; }
         }
     </style>
 </head>
@@ -295,23 +669,151 @@
         <section class="popular-section">
             <h2 data-lang-key="most_popular_title">Most Popular</h2>
             <div class="popular-grid">
+                <!-- Item 1 -->
                 <div class="popular-item">
-                    <img src="https://i.scdn.co/image/ab67616d00001e025d7988b9154f5fac80ed1d39" alt="Popular Item 1">
+                    <div class="popular-item-image-wrapper">
+                        <img src="https://i.scdn.co/image/ab67616d00001e025d7988b9154f5fac80ed1d39" alt="Popular Item 1">
+                        <div class="popular-item-overlay">
+                            <button class="action-btn add-btn" title="Add">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2ZM17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2Z"/></svg>
+                            </button>
+                            <a href="https://wangpao.github.io/SnapDek/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AF%B9%E8%AF%9D-1.dek" download class="action-btn download-btn" title="Download">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 15L7 12h3V8h4v4h3l-5 5Z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="popular-item-info">
+                        <h3 class="item-title">德语日常对话 1</h3>
+                        <p class="item-author">Snap 德语</p>
+                    </div>
                 </div>
+                <!-- Item 2 -->
                 <div class="popular-item">
-                    <img src="https://i.scdn.co/image/ab67616d00001e02258f26eb6ce7851a80fcf3df" alt="Popular Item 2">
+                    <div class="popular-item-image-wrapper">
+                        <img src="https://i.scdn.co/image/ab67616d00001e02258f26eb6ce7851a80fcf3df" alt="Popular Item 2">
+                        <div class="popular-item-overlay">
+                             <button class="action-btn add-btn" title="Add">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2ZM17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2Z"/></svg>
+                            </button>
+                            <a href="https://wangpao.github.io/SnapDek/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AF%B9%E8%AF%9D-1.dek" download class="action-btn download-btn" title="Download">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 15L7 12h3V8h4v4h3l-5 5Z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="popular-item-info">
+                        <h3 class="item-title">德语日常对话 2</h3>
+                        <p class="item-author">Snap 德语</p>
+                    </div>
                 </div>
+                <!-- Item 3 -->
                 <div class="popular-item">
-                    <img src="https://i.scdn.co/image/ab67616d00001e02c8b444df094279e70d0ed856" alt="Popular Item 3">
+                    <div class="popular-item-image-wrapper">
+                        <img src="https://i.scdn.co/image/ab67616d00001e02c8b444df094279e70d0ed856" alt="Popular Item 3">
+                         <div class="popular-item-overlay">
+                             <button class="action-btn add-btn" title="Add">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2ZM17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2Z"/></svg>
+                            </button>
+                            <a href="https://wangpao.github.io/SnapDek/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AF%B9%E8%AF%9D-1.dek" download class="action-btn download-btn" title="Download">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 15L7 12h3V8h4v4h3l-5 5Z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="popular-item-info">
+                        <h3 class="item-title">德语日常对话 3</h3>
+                        <p class="item-author">Snap 德语</p>
+                    </div>
                 </div>
+                <!-- Item 4 -->
                 <div class="popular-item">
-                    <img src="https://i.scdn.co/image/ab67616d00001e024f13783ebca8686ddc7992e7" alt="Popular Item 4">
+                    <div class="popular-item-image-wrapper">
+                        <img src="https://i.scdn.co/image/ab67616d00001e024f13783ebca8686ddc7992e7" alt="Popular Item 4">
+                         <div class="popular-item-overlay">
+                             <button class="action-btn add-btn" title="Add">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2ZM17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2Z"/></svg>
+                            </button>
+                            <a href="https://wangpao.github.io/SnapDek/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AF%B9%E8%AF%9D-1.dek" download class="action-btn download-btn" title="Download">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 15L7 12h3V8h4v4h3l-5 5Z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="popular-item-info">
+                        <h3 class="item-title">德语日常对话 4</h3>
+                        <p class="item-author">Snap 德语</p>
+                    </div>
                 </div>
+                <!-- Item 5 -->
                 <div class="popular-item">
-                    <img src="https://i.scdn.co/image/ab67616d00001e02258f26eb6ce7851a80fcf3df" alt="Popular Item 5">
+                    <div class="popular-item-image-wrapper">
+                        <img src="https://i.scdn.co/image/ab67616d00001e02258f26eb6ce7851a80fcf3df" alt="Popular Item 5">
+                         <div class="popular-item-overlay">
+                             <button class="action-btn add-btn" title="Add">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2ZM17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2Z"/></svg>
+                            </button>
+                            <a href="https://wangpao.github.io/SnapDek/%E8%8B%B1%E8%AF%AD%E6%97%A5%E5%B8%B8%E5%AF%B9%E8%AF%9D-1.dek" download class="action-btn download-btn" title="Download">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 15L7 12h3V8h4v4h3l-5 5Z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="popular-item-info">
+                        <h3 class="item-title">德语日常对话 5</h3>
+                        <p class="item-author">Snap 德语</p>
+                    </div>
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- Modal HTML -->
+    <div id="dekDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button">&times;</span>
+            <div class="modal-header">
+                <div class="modal-image-backdrop"></div>
+                <div class="modal-image-container">
+                    <img id="modalDekImage" src="" alt="Dek Image">
+                </div>
+                <div class="modal-info">
+                    <div class="modal-title-line">
+                        <img id="modalCountryFlag" src="" alt="Country Flag" class="country-flag-icon">
+                        <h3 id="modalDekTitle"></h3>
+                    </div>
+                    <p id="modalDekAuthor" class="modal-author"></p>
+                    <p id="modalDekDate" class="modal-date"></p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn modal-add-btn" title="Add">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2ZM17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2Z"/></svg>
+                </button>
+                <a href="#" id="modalDownloadLink" download class="action-btn modal-download-btn" title="Download">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 15L7 12h3V8h4v4h3l-5 5Z"/></svg>
+                </a>
+                <button class="action-btn modal-more-btn" title="More">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                </button>
+            </div>
+            <div class="modal-card-content-separator">
+                <span># 卡片内容</span>
+            </div>
+            <div class="modal-card-list">
+                <div class="card-item">
+                    <p class="card-text-en">1. I often listen to music while commuting because it helps me relax and pass the time.</p>
+                    <p class="card-text-zh">我通勤时常听音乐，因为这能让我放松，也打发时间。</p>
+                </div>
+                <div class="card-item">
+                    <p class="card-text-en">2. Drinking a glass of warm water in the morning has become part of my daily routine.</p>
+                    <p class="card-text-zh">每天早上喝一杯温水已经成了我的日常习惯。</p>
+                </div>
+                <div class="card-item">
+                    <p class="card-text-en">3. On weekends, I usually clean my apartment and do some grocery shopping for the week.</p>
+                    <p class="card-text-zh">周末我通常会打扫公寓，并采购下一周的食物。</p>
+                </div>
+                 <div class="card-item">
+                    <p class="card-text-en">4. I always try to go to bed before midnight to make sure I get enough sleep.</p>
+                    <p class="card-text-zh">我总是尽量在午夜前睡觉，以确保有充足的睡眠。</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -388,10 +890,106 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
-            setTheme(savedTheme); // This will also set the correct icon visibility
+            setTheme(savedTheme); 
 
             const savedLanguage = localStorage.getItem('language') || 'en';
             setLanguage(savedLanguage);
+
+            const modal = document.getElementById('dekDetailModal');
+            const modalCloseButton = modal.querySelector('.modal-close-button');
+            const popularItems = document.querySelectorAll('.popular-item');
+
+            const modalDekImage = document.getElementById('modalDekImage');
+            const modalImageBackdrop = modal.querySelector('.modal-image-backdrop');
+            const modalCountryFlag = document.getElementById('modalCountryFlag');
+            const modalDekTitle = document.getElementById('modalDekTitle');
+            const modalDekAuthor = document.getElementById('modalDekAuthor');
+            const modalDekDate = document.getElementById('modalDekDate');
+            const modalDownloadLink = document.getElementById('modalDownloadLink');
+
+            popularItems.forEach(item => {
+                item.addEventListener('click', (event) => {
+                    if (event.target.closest('.action-btn')) {
+                        // Click on action button within popular item handled by their own listeners if any
+                        return; 
+                    }
+
+                    const imgSrc = item.querySelector('.popular-item-image-wrapper img').src;
+                    const title = item.querySelector('.item-title').textContent;
+                    const author = item.querySelector('.item-author').textContent;
+                    const datePublished = "发布于 2025年7月6日"; // Example
+                    const countryFlagUrl = "https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/4.1.5/flags/4x3/de.svg"; // German flag CDN
+
+
+                    if(modalDekImage) modalDekImage.src = imgSrc;
+                    if(modalImageBackdrop) modalImageBackdrop.style.backgroundImage = `url(${imgSrc})`;
+                    if(modalCountryFlag) modalCountryFlag.src = countryFlagUrl;
+                    if(modalDekTitle) modalDekTitle.textContent = title;
+                    if(modalDekAuthor) modalDekAuthor.textContent = author;
+                    if(modalDekDate) modalDekDate.textContent = datePublished;
+                    
+                    const itemDownloadLink = item.querySelector('a.download-btn');
+                    if(modalDownloadLink && itemDownloadLink) modalDownloadLink.href = itemDownloadLink.href;
+                    else if(modalDownloadLink) modalDownloadLink.href = "#"; // Fallback
+
+
+                    if(modal) modal.style.display = 'flex';
+                });
+            });
+            
+            document.querySelectorAll('.popular-item .add-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    console.log('Add button on popular item clicked.');
+                });
+            });
+
+            document.querySelectorAll('.popular-item .download-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    console.log('Download button on popular item clicked.');
+                });
+            });
+
+            // Modal's own action buttons
+            const modalAddBtn = modal.querySelector('.modal-add-btn');
+            if (modalAddBtn) {
+                modalAddBtn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    console.log('Modal Add button clicked for:', modalDekTitle.textContent);
+                });
+            }
+            
+            const modalInternalDownloadBtn = modal.querySelector('.modal-download-btn'); // This is an <a> tag
+             if (modalInternalDownloadBtn) {
+                modalInternalDownloadBtn.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Important if it's nested or to prevent other modal actions
+                    console.log('Modal Download button clicked for:', modalDekTitle.textContent);
+                    // The download will be handled by the <a> tag's default behavior
+                });
+            }
+
+            const modalMoreBtn = modal.querySelector('.modal-more-btn');
+            if (modalMoreBtn) {
+                modalMoreBtn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    console.log('Modal More options button clicked for:', modalDekTitle.textContent);
+                });
+            }
+
+            if (modalCloseButton) {
+                modalCloseButton.addEventListener('click', () => {
+                    if(modal) modal.style.display = 'none';
+                });
+            }
+
+            if (modal) {
+                window.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
         });
     </script>
 </body>
