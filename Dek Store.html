@@ -296,11 +296,12 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow-y: auto;
+            overflow-y: auto; /* Keep for desktop if content exceeds viewport */
             background-color: rgba(0,0,0,0.7);
+            /* Default for desktop: center alignment */
             align-items: center;
             justify-content: center;
-            padding: 20px 0;
+            padding: 20px 0; /* Padding for desktop scroll */
         }
         html.dark-mode .modal {
              background-color: rgba(10,10,10,0.85);
@@ -309,18 +310,24 @@
         .modal-content {
             padding: 0;
             border: 1px solid var(--border-color);
-            width: 90%;
-            max-width: 400px;
+            /* Desktop width */
+            width: 90%; /* Fallback for very large screens, overridden by max-width */
+            max-width: 560px; /* DESKTOP: Increased from 480px */
             border-radius: 12px;
             position: relative;
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             text-align: left;
-            overflow: hidden;
+            overflow: hidden; /* Important for border-radius with internal scrolling */
             display: flex;
             flex-direction: column;
+            /* Default max-height for desktop, can be overridden by mobile */
+            max-height: 90vh; /* Ensure it doesn't exceed viewport height */
+            /* Transition for opacity on desktop if desired, mobile handles transform separately */
+            /* transition: opacity 0.3s ease-out; */
         }
+
         html.dark-mode .modal-content {
-            background-color: #282828; /* Screenshot modal background */
+            background-color: #282828;
             border-color: #404040;
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
@@ -337,7 +344,7 @@
             font-size: 24px;
             font-weight: bold;
             line-height: 1;
-            z-index: 2; /* Above backdrop and content in header */
+            z-index: 10; /* Ensure it's above backdrop/header content */
         }
         .modal-close-button:hover,
         .modal-close-button:focus {
@@ -359,7 +366,8 @@
             gap: 15px;
             position: relative;
             overflow: hidden;
-            color: #fff; /* Default text color for header content on dark/blurred bg */
+            color: #fff;
+            flex-shrink: 0; /* Prevent header from shrinking if card list is long */
         }
         
         .modal-image-backdrop {
@@ -372,18 +380,17 @@
             background-size: cover;
             background-position: center;
             filter: blur(25px) brightness(0.5) saturate(1.2);
-            transform: scale(1.15); /* Scale slightly more to ensure blur covers edges */
+            transform: scale(1.15);
         }
         html:not(.dark-mode) .modal-header {
-            background-color: var(--bg-color); /* Fallback for light mode */
+            background-color: var(--bg-color);
             color: var(--text-color);
         }
         html:not(.dark-mode) .modal-image-backdrop {
-            /* Optionally, a different filter or display:none for light mode */
              filter: blur(20px) brightness(0.9) saturate(1.1);
         }
 
-        .modal-image-container, .modal-info { /* content on top of backdrop */
+        .modal-image-container, .modal-info {
             position: relative;
             z-index: 1;
         }
@@ -409,63 +416,52 @@
             flex-direction: column;
             justify-content: center;
             flex-grow: 1;
+            align-items: flex-start; 
         }
-        html:not(.dark-mode) .modal-info { /* Ensure text is readable in light mode header */
+        html:not(.dark-mode) .modal-info {
             color: var(--text-color);
         }
 
-
-        .modal-title-line {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
-
         .country-flag-icon {
-            width: 20px;
-            height: 15px;
-            border-radius: 3px; /* Slightly more rounded to match screenshot */
+            width: 22px; 
+            height: 22px; 
+            border-radius: 50%; 
             object-fit: cover;
-            /* border: 1px solid rgba(0,0,0,0.1); Removed, screenshot doesn't show border */
+            margin-bottom: 6px; 
+            display: block; 
         }
 
         #modalDekTitle {
-            font-size: 1.15rem; /* Approx from screenshot */
-            font-weight: bold; /* Screenshot title is bold */
-            margin: 0;
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin: 0 0 4px 0; 
             line-height: 1.3;
         }
 
         .modal-author, .modal-date {
-            font-size: 0.8rem; /* Approx from screenshot */
+            font-size: 0.8rem;
             margin: 2px 0;
             line-height: 1.4;
-            opacity: 0.85; /* Slightly less transparent text for better readability on dark bg */
+            opacity: 0.85;
         }
-        /* Text color for author/date is inherited from .modal-header (white on dark mode) */
          html:not(.dark-mode) .modal-author, html:not(.dark-mode) .modal-date {
             color: var(--secondary-text-color);
             opacity: 1;
         }
-
 
         .modal-actions {
             display: flex;
             align-items: center;
             gap: 18px;
             padding: 10px 20px 15px 20px;
+            flex-shrink: 0; /* Prevent actions from shrinking */
         }
-        /* Background for actions area is same as modal-content background */
-        /* html.dark-mode .modal-actions { background-color: #282828; } */
-        /* html:not(.dark-mode) .modal-actions { background-color: var(--bg-color); } */
-
 
         .modal-actions .action-btn {
             padding: 5px;
         }
         .modal-actions .action-btn .icon-svg {
-            width: 24px; /* Slightly larger icons */
+            width: 24px;
             height: 24px;
             fill: var(--secondary-text-color);
         }
@@ -485,64 +481,87 @@
         }
 
         .modal-card-content-separator {
-            padding: 12px 20px 8px 20px; /* Adjusted padding */
-            font-size: 0.75rem; /* Smaller text for separator */
+            display: flex; 
+            align-items: baseline; 
+            padding: 15px 20px 10px 20px; 
+            font-size: 0.75rem;
             font-weight: bold;
             color: var(--secondary-text-color);
             border-top: 1px solid var(--border-color);
-            text-transform: uppercase; /* As in some UI styles for separators */
+            text-transform: uppercase;
+            flex-shrink: 0; /* Prevent separator from shrinking */
         }
         html.dark-mode .modal-card-content-separator {
-            color: #888; /* Lighter grey for separator text in dark mode */
+            color: #888;
             border-top: 1px solid #404040;
         }
-        .modal-card-content-separator span {
+        .separator-hash {
+            min-width: 15px; /* Aligns with .card-item-number */
+            padding-right: 10px; /* Space from text, matches .card-item-number */
+        }
+        .separator-text {
             letter-spacing: 0.5px;
         }
 
-
         .modal-card-list {
-            padding: 0 20px 20px 20px;
-            max-height: 300px;
+            padding: 0 20px 20px 20px; 
+            /* DESKTOP: Increased max-height */
+            max-height: 400px; /* Increased from 300px */
             overflow-y: auto;
-            flex-grow: 1;
+            flex-grow: 1; /* Allow list to take available space */
         }
         html.dark-mode .modal-card-list {
-            background-color: #1e1e1e; /* Darker bg for list area */
+            background-color: #1e1e1e;
         }
         html:not(.dark-mode) .modal-card-list {
-            background-color: var(--bg-color); /* Consistent with content bg */
+            background-color: var(--bg-color);
         }
-
-
-        .card-item {
-            padding: 12px;
+        
+        .card-item-wrapper {
+            display: flex;
+            align-items: flex-start; 
             margin-bottom: 10px;
-            border-radius: 8px; /* More rounded cards */
         }
-        .card-item:last-child {
+        .card-item-wrapper:last-child {
             margin-bottom: 0;
         }
-        html.dark-mode .card-item {
-            background-color: #333333; /* Card background from screenshot */
+
+        .card-item-number {
+            min-width: 15px; 
+            padding-right: 10px; 
+            font-weight: bold;
+            color: var(--secondary-text-color);
+            line-height: 1.5; 
+            padding-top: 0; 
+        }
+        html.dark-mode .card-item-number {
+            color: #a0a0a0;
+        }
+
+        .card-item-texts { 
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        html.dark-mode .card-item-texts {
+            background-color: #333333;
             color: #e0e0e0;
         }
-        html:not(.dark-mode) .card-item {
-             background-color: var(--button-bg-color); /* Light mode card bg */
+        html:not(.dark-mode) .card-item-texts {
+             background-color: var(--button-bg-color);
         }
 
-
-        .card-item p {
+        .card-item-texts p {
             margin: 0 0 5px 0;
             line-height: 1.5;
         }
-        .card-item p:last-child {
+        .card-item-texts p:last-child {
             margin-bottom: 0;
         }
 
         .card-text-en {
             font-size: 0.9rem;
-            margin-bottom: 8px !important; /* Ensure space before ZH text */
+            margin-bottom: 8px !important;
         }
         html.dark-mode .card-text-en {
             color: #f0f0f0;
@@ -554,26 +573,44 @@
         .card-text-zh {
             font-size: 0.9rem;
             padding: 6px 10px;
-            border-radius: 6px; /* Match card rounding */
+            border-radius: 6px;
             display: inline-block;
-            background-color: #8a63d233; /* Adjusted purple: lighter base, less opacity */
-            color: #774bbc;  /* Adjusted purple text color */
+            background-color: #8a63d233;
+            color: #774bbc;
         }
         html.dark-mode .card-text-zh {
-            background-color: #583787; /* Darker purple highlight for dark mode, as per screenshot */
-            color: #d1b3f0; /* Lighter purple text for dark mode */
+            background-color: #583787;
+            color: #d1b3f0;
         }
 
-        @media (max-height: 700px) { /* Adjust breakpoint based on typical content length */
-            .modal-content {
-                max-height: 90vh;
-            }
-             .modal-card-list {
-                max-height: 200px; /* Reduce max height on smaller viewports */
-            }
-        }
-
+        /* Mobile specific modal adjustments */
         @media (max-width: 768px) {
+            .modal {
+                align-items: flex-end; /* Stick to bottom */
+                padding: 0; /* Remove padding for full-width bottom sheet */
+                overflow: hidden; /* Prevent scroll on body when modal is up */
+            }
+            .modal-content {
+                width: 100%;
+                max-width: 100%; /* Override desktop max-width */
+                height: 85vh; /* MOBILE: Increased height */
+                max-height: 85vh; /* Ensure it respects this height */
+                border-radius: 20px 20px 0 0; /* Top corners rounded for bottom sheet */
+                margin: 0; /* Remove auto margins */
+                transform: translateY(100%); /* Initial position: off-screen bottom */
+                transition: transform 0.3s ease-out;
+            }
+            .modal.modal-active .modal-content {
+                transform: translateY(0); /* Slide in */
+            }
+            /* Adjust card list height for mobile if needed, flex-grow will handle it with fixed modal-content height */
+             .modal-card-list {
+                /* max-height will be implicitly determined by flex-grow within the 85vh modal-content */
+            }
+        }
+
+
+        @media (max-width: 768px) { /* This block is for general responsive, separate from modal specific above */
             .container { padding: 10px; }
             .hero-section h1 { font-size: 2rem; }
             .hero-section .subtitle { font-size: 0.9375rem; }
@@ -588,7 +625,7 @@
             .item-author { font-size: 0.75rem; }
         }
 
-        @media (max-width: 420px) {
+        @media (max-width: 420px) { /* Very small screens, fine-tune if needed */
             .top-bar {
                 justify-content: flex-start;
             }
@@ -602,17 +639,19 @@
             .hero-section .subtitle { font-size: 0.875rem; }
             .item-title { font-size: 0.85rem; }
             .item-author { font-size: 0.7rem; }
-             .modal-content {
-                max-width: 95%; /* Allow modal to be wider on small screens */
-            }
-            .modal-header { padding: 15px; gap: 10px;}
-            .modal-image-container { width: 80px; height: 80px;}
+            /* .modal-content width is already 100% from 768px media query */
+            .modal-header { padding: 15px 15px 10px 15px; gap: 10px;} /* Adjusted padding for smaller modal */
+            .modal-image-container { width: 70px; height: 70px;} /* Slightly smaller image */
             #modalDekTitle { font-size: 1rem; }
             .modal-author, .modal-date { font-size: 0.75rem; }
             .modal-actions { padding: 8px 15px 12px 15px; gap: 12px;}
             .modal-actions .action-btn .icon-svg { width: 22px; height: 22px;}
             .modal-card-content-separator { padding: 10px 15px 6px 15px; }
+             .separator-hash { min-width: 12px; padding-right: 8px;} /* Adjusted for smaller screens */
             .modal-card-list { padding: 0 15px 15px 15px; }
+            .country-flag-icon { width: 20px; height: 20px; margin-bottom: 5px; }
+            .card-item-number { min-width: 12px; padding-right: 8px;}
+            .card-item-texts { padding: 10px; }
         }
     </style>
 </head>
@@ -773,10 +812,8 @@
                     <img id="modalDekImage" src="" alt="Dek Image">
                 </div>
                 <div class="modal-info">
-                    <div class="modal-title-line">
-                        <img id="modalCountryFlag" src="" alt="Country Flag" class="country-flag-icon">
-                        <h3 id="modalDekTitle"></h3>
-                    </div>
+                    <img id="modalCountryFlag" src="" alt="Country Flag" class="country-flag-icon">
+                    <h3 id="modalDekTitle"></h3>
                     <p id="modalDekAuthor" class="modal-author"></p>
                     <p id="modalDekDate" class="modal-date"></p>
                 </div>
@@ -793,24 +830,37 @@
                 </button>
             </div>
             <div class="modal-card-content-separator">
-                <span># 卡片内容</span>
+                <span class="separator-hash">#</span>
+                <span class="separator-text">卡片内容</span>
             </div>
             <div class="modal-card-list">
-                <div class="card-item">
-                    <p class="card-text-en">1. I often listen to music while commuting because it helps me relax and pass the time.</p>
-                    <p class="card-text-zh">我通勤时常听音乐，因为这能让我放松，也打发时间。</p>
+                <div class="card-item-wrapper">
+                    <span class="card-item-number">1.</span>
+                    <div class="card-item-texts">
+                        <p class="card-text-en">I often listen to music while commuting because it helps me relax and pass the time.</p>
+                        <p class="card-text-zh">我通勤时常听音乐，因为这能让我放松，也打发时间。</p>
+                    </div>
                 </div>
-                <div class="card-item">
-                    <p class="card-text-en">2. Drinking a glass of warm water in the morning has become part of my daily routine.</p>
-                    <p class="card-text-zh">每天早上喝一杯温水已经成了我的日常习惯。</p>
+                <div class="card-item-wrapper">
+                    <span class="card-item-number">2.</span>
+                    <div class="card-item-texts">
+                        <p class="card-text-en">Drinking a glass of warm water in the morning has become part of my daily routine.</p>
+                        <p class="card-text-zh">每天早上喝一杯温水已经成了我的日常习惯。</p>
+                    </div>
                 </div>
-                <div class="card-item">
-                    <p class="card-text-en">3. On weekends, I usually clean my apartment and do some grocery shopping for the week.</p>
-                    <p class="card-text-zh">周末我通常会打扫公寓，并采购下一周的食物。</p>
+                <div class="card-item-wrapper">
+                    <span class="card-item-number">3.</span>
+                     <div class="card-item-texts">
+                        <p class="card-text-en">On weekends, I usually clean my apartment and do some grocery shopping for the week.</p>
+                        <p class="card-text-zh">周末我通常会打扫公寓，并采购下一周的食物。</p>
+                    </div>
                 </div>
-                 <div class="card-item">
-                    <p class="card-text-en">4. I always try to go to bed before midnight to make sure I get enough sleep.</p>
-                    <p class="card-text-zh">我总是尽量在午夜前睡觉，以确保有充足的睡眠。</p>
+                 <div class="card-item-wrapper">
+                    <span class="card-item-number">4.</span>
+                    <div class="card-item-texts">
+                        <p class="card-text-en">I always try to go to bed before midnight to make sure I get enough sleep.</p>
+                        <p class="card-text-zh">我总是尽量在午夜前睡觉，以确保有充足的睡眠。</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -895,10 +945,13 @@
             const savedLanguage = localStorage.getItem('language') || 'en';
             setLanguage(savedLanguage);
 
+            // Modal elements
             const modal = document.getElementById('dekDetailModal');
+            const modalContent = modal.querySelector('.modal-content');
             const modalCloseButton = modal.querySelector('.modal-close-button');
             const popularItems = document.querySelectorAll('.popular-item');
 
+            // Modal data population elements
             const modalDekImage = document.getElementById('modalDekImage');
             const modalImageBackdrop = modal.querySelector('.modal-image-backdrop');
             const modalCountryFlag = document.getElementById('modalCountryFlag');
@@ -907,36 +960,66 @@
             const modalDekDate = document.getElementById('modalDekDate');
             const modalDownloadLink = document.getElementById('modalDownloadLink');
 
+            function openDekModal(item) {
+                // Populate modal content
+                const imgSrc = item.querySelector('.popular-item-image-wrapper img').src;
+                const title = item.querySelector('.item-title').textContent;
+                const author = item.querySelector('.item-author').textContent;
+                const datePublished = "发布于 2025年7月6日"; 
+                const countryFlagUrl = "https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/4.1.5/flags/4x3/de.svg";
+
+                if(modalDekImage) modalDekImage.src = imgSrc;
+                if(modalImageBackdrop) modalImageBackdrop.style.backgroundImage = `url(${imgSrc})`;
+                if(modalCountryFlag) modalCountryFlag.src = countryFlagUrl;
+                if(modalDekTitle) modalDekTitle.textContent = title;
+                if(modalDekAuthor) modalDekAuthor.textContent = author;
+                if(modalDekDate) modalDekDate.textContent = datePublished;
+                
+                const itemDownloadLink = item.querySelector('a.download-btn');
+                if(modalDownloadLink && itemDownloadLink) modalDownloadLink.href = itemDownloadLink.href;
+                else if(modalDownloadLink) modalDownloadLink.href = "#";
+
+                // Show modal with animation
+                modal.style.display = 'flex';
+                // Force a reflow/repaint before adding the class to ensure the transition plays
+                requestAnimationFrame(() => {
+                    modal.classList.add('modal-active');
+                });
+            }
+
+            function closeDekModal() {
+                modal.classList.remove('modal-active');
+
+                const onModalTransitionEnd = (event) => {
+                    // Make sure the event is from the modal-content itself if it has the transition
+                    if (event.target === modalContent) {
+                        modal.style.display = 'none';
+                        modalContent.removeEventListener('transitionend', onModalTransitionEnd);
+                    }
+                };
+                
+                const computedStyle = window.getComputedStyle(modalContent);
+                // Check if there's a transition that will fire for the transform property (for mobile)
+                // or any other property that might have a transition (e.g. opacity for desktop, though not implemented here)
+                if (computedStyle.transitionDuration !== '0s' && computedStyle.transitionProperty !== 'none') {
+                    modalContent.addEventListener('transitionend', onModalTransitionEnd);
+                } else {
+                    // No transition (e.g., on desktop view where transform isn't changing)
+                    modal.style.display = 'none';
+                }
+            }
+
             popularItems.forEach(item => {
                 item.addEventListener('click', (event) => {
                     if (event.target.closest('.action-btn')) {
-                        // Click on action button within popular item handled by their own listeners if any
+                        // Let action button's own listener handle it (if any)
                         return; 
                     }
-
-                    const imgSrc = item.querySelector('.popular-item-image-wrapper img').src;
-                    const title = item.querySelector('.item-title').textContent;
-                    const author = item.querySelector('.item-author').textContent;
-                    const datePublished = "发布于 2025年7月6日"; // Example
-                    const countryFlagUrl = "https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/4.1.5/flags/4x3/de.svg"; // German flag CDN
-
-
-                    if(modalDekImage) modalDekImage.src = imgSrc;
-                    if(modalImageBackdrop) modalImageBackdrop.style.backgroundImage = `url(${imgSrc})`;
-                    if(modalCountryFlag) modalCountryFlag.src = countryFlagUrl;
-                    if(modalDekTitle) modalDekTitle.textContent = title;
-                    if(modalDekAuthor) modalDekAuthor.textContent = author;
-                    if(modalDekDate) modalDekDate.textContent = datePublished;
-                    
-                    const itemDownloadLink = item.querySelector('a.download-btn');
-                    if(modalDownloadLink && itemDownloadLink) modalDownloadLink.href = itemDownloadLink.href;
-                    else if(modalDownloadLink) modalDownloadLink.href = "#"; // Fallback
-
-
-                    if(modal) modal.style.display = 'flex';
+                    openDekModal(item);
                 });
             });
             
+            // Event listeners for popular item action buttons (stopPropagation)
             document.querySelectorAll('.popular-item .add-btn').forEach(button => {
                 button.addEventListener('click', (event) => {
                     event.stopPropagation();
@@ -951,21 +1034,20 @@
                 });
             });
 
-            // Modal's own action buttons
+            // Event listeners for modal's own action buttons
             const modalAddBtn = modal.querySelector('.modal-add-btn');
             if (modalAddBtn) {
                 modalAddBtn.addEventListener('click', (event) => {
-                    event.stopPropagation();
+                    event.stopPropagation(); // Prevent modal backdrop click if actions are inside modal-content
                     console.log('Modal Add button clicked for:', modalDekTitle.textContent);
                 });
             }
             
-            const modalInternalDownloadBtn = modal.querySelector('.modal-download-btn'); // This is an <a> tag
-             if (modalInternalDownloadBtn) {
+            const modalInternalDownloadBtn = modal.querySelector('.modal-download-btn');
+            if (modalInternalDownloadBtn) {
                 modalInternalDownloadBtn.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Important if it's nested or to prevent other modal actions
+                    event.stopPropagation(); 
                     console.log('Modal Download button clicked for:', modalDekTitle.textContent);
-                    // The download will be handled by the <a> tag's default behavior
                 });
             }
 
@@ -977,16 +1059,16 @@
                 });
             }
 
+            // Modal close mechanisms
             if (modalCloseButton) {
-                modalCloseButton.addEventListener('click', () => {
-                    if(modal) modal.style.display = 'none';
-                });
+                modalCloseButton.addEventListener('click', closeDekModal);
             }
 
             if (modal) {
-                window.addEventListener('click', (event) => {
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
+                 // Listen on modal for backdrop clicks
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) { // Clicked on the .modal backdrop itself
+                        closeDekModal();
                     }
                 });
             }
