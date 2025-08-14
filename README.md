@@ -11,7 +11,7 @@ SnapDek is a simple and elegant tool designed to assist with memorization.
   ## Quick Start
 
 - To use SnapDek directly, please visit: [https://wangpao.github.io/SnapDek/](https://wangpao.github.io/SnapDek/)
-- To create or edit ddk card packs, please visit: [https://wangpao.github.io/SnapDek/SnapDek%20Studio.html](https://wangpao.github.io/SnapDek/SnapDek%20Studio.html)
+- To create or edit dek card packs, please visit: [https://wangpao.github.io/SnapDek/SnapDek%20Studio.html](https://wangpao.github.io/SnapDek/SnapDek%20Studio.html)
 
 ## Getting Started
 
