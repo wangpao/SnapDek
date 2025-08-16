@@ -520,6 +520,25 @@
         themeButtonLight.addEventListener('click', () => applyAppTheme('light'));
         themeButtonDark.addEventListener('click', () => applyAppTheme('dark'));
 
+        // --- Load DEK from URL ---
+        async function loadDekFromUrl(url, dekName) {
+            try {
+                showStatus(`Loading default DEK from ${url}...`, 'info', 0);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const arrayBuffer = await response.arrayBuffer();
+                const blob = new Blob([arrayBuffer]);
+                const file = new File([blob], dekName, { type: 'application/octet-stream' });
+                await processUploadedDekFile(file, dekName);
+            } catch (error) {
+                console.error('Failed to load DEK from URL:', error);
+                showStatus(`Failed to load default DEK: ${error.message}`, 'error');
+                resetPlayerState(true);
+            }
+        }
+
         // --- Initialization ---
         window.addEventListener('load', async () => {
             fab_playPauseButton.innerHTML = svgIconPlay;
@@ -527,10 +546,24 @@
 
             const savedTheme = localStorage.getItem(STORAGE_APP_THEME) || 'light';
             applyAppTheme(savedTheme);
-            try { await initDB(); populateDekSidebarList(); const lastOpened = localStorage.getItem('dekPlayer_lastOpenedDek'); const knownDeks = getKnownDekNames();
-                if (lastOpened && knownDeks.includes(lastOpened)) { await loadDekDataFromStorage(lastOpened); }
-                else { resetPlayerState(true); }
-            } catch (error) { showStatus("Database initialization failed.", "error", 0); console.error("DB Init failed on load:", error); resetPlayerState(true); }
+            try { 
+                await initDB(); 
+                populateDekSidebarList(); 
+                const lastOpened = localStorage.getItem('dekPlayer_lastOpenedDek'); 
+                const knownDeks = getKnownDekNames();
+                if (lastOpened && knownDeks.includes(lastOpened)) { 
+                    await loadDekDataFromStorage(lastOpened); 
+                } else {
+                    // Load default DEK if no previous DEK exists
+                    const defaultDekUrl = 'https://wangpao.github.io/SnapDek/Sample.dek';
+                    const defaultDekName = 'Sample.dek';
+                    await loadDekFromUrl(defaultDekUrl, defaultDekName);
+                }
+            } catch (error) { 
+                showStatus("Database initialization failed.", "error", 0); 
+                console.error("DB Init failed on load:", error); 
+                resetPlayerState(true); 
+            }
             updateButtonStatesAll(); updateDekTitle(); updatePlaybackInfoAll();
         });
 
