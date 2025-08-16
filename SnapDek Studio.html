@@ -811,6 +811,43 @@ it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian 
             statusSpan.textContent = 'Preparing...';
             progressBar.value = 0;
 
+            // 添加重试辅助函数
+            async function generateAudioWithRetry(audioText, voice, entryIndex, maxRetries = 5) {
+                const baseDelay = 2000; // 基础延迟2秒
+                
+                for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                    try {
+                        log(`Attempt ${attempt}/${maxRetries} for entry ${entryIndex + 1}`);
+                        
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: audioText, voice })
+                        });
+
+                        if (!response.ok) {
+                            const errorBody = await response.text();
+                            throw new Error(`API request failed for entry ${entryIndex + 1} (status ${response.status}): ${errorBody}`);
+                        }
+
+                        const blob = await response.blob();
+                        return blob;
+                        
+                    } catch (error) {
+                        log(`Attempt ${attempt}/${maxRetries} failed for entry ${entryIndex + 1}: ${error.message}`);
+                        
+                        if (attempt === maxRetries) {
+                            throw error; // 最后一次尝试失败，抛出错误
+                        }
+                        
+                        // 计算延迟时间（指数退避）
+                        const delay = baseDelay * Math.pow(2, attempt - 1);
+                        log(`Waiting ${delay}ms before retry...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                }
+            }
+
             for (let i = 0; i < texts.length; i++) {
                 const originalEntryText = texts[i]; 
                 const audioText = removeParentheses(originalEntryText); 
@@ -828,18 +865,9 @@ it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian 
                     log(`Created ${fileNameBase}.txt (original content) for skipped audio.`);
                 } else {
                     try {
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ text: audioText, voice })
-                        });
-
-                        if (!response.ok) {
-                            const errorBody = await response.text();
-                            throw new Error(`API request failed for entry ${i+1} (status ${response.status}): ${errorBody}`);
-                        }
-
-                        const blob = await response.blob();
+                        // 使用重试机制生成音频
+                        const blob = await generateAudioWithRetry(audioText, voice, i);
+                        
                         generatedAudioData[i] = blob; 
                         zip.file(`${fileNameBase}.mp3`, blob);
                         zip.file(`${fileNameBase}.txt`, originalEntryText);
@@ -864,10 +892,13 @@ it-IT-IsabellaNeural	Female	it-IT	Microsoft Isabella Online (Natural) - Italian 
                         }
 
                     } catch (error) {
-                        console.error('Error generating audio for entry ' + (i + 1) + ':', error);
-                        log(`Error for entry ${i + 1}: ${error.message}.`);
-                        zip.file(`${fileNameBase}.txt`, originalEntryText); 
-                        log(`Created ${fileNameBase}.txt (original content) despite audio error for entry ${i+1}.`);
+                        console.error('Error generating audio for entry ' + (i + 1) + ' after all retries:', error);
+                        log(`Failed to generate audio for entry ${i + 1} after all retry attempts: ${error.message}`);
+                        log(`Entry ${i + 1} will be skipped. Please check your network connection and API status.`);
+                        // 注意：这里不再创建txt文件，因为我们希望确保所有条目都成功
+                        // 如果用户希望即使失败也要创建txt文件，可以取消下面两行的注释
+                        // zip.file(`${fileNameBase}.txt`, originalEntryText); 
+                        // log(`Created ${fileNameBase}.txt (original content) despite audio error for entry ${i+1}.`);
                     }
                 }
                 progressBar.value = ((i + 1) / texts.length) * 100;
