@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiniMax TTS 本地阅读器</title>
+  <style>
+    :root {
+      --bg: #f6f0e6;
+      --panel: rgba(255, 252, 247, 0.82);
+      --panel-strong: rgba(255, 252, 247, 0.95);
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --accent: #b45309;
+      --accent-dark: #7c2d12;
+      --line: rgba(31, 41, 55, 0.12);
+      --ok: #166534;
+      --bad: #b91c1c;
+      --shadow: 0 18px 50px rgba(124, 45, 18, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(245, 158, 11, 0.28), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(180, 83, 9, 0.18), transparent 24%),
+        linear-gradient(135deg, #f7f1e7 0%, #efe4d0 48%, #f8f5ee 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(920px, 100%);
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(18px);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 32px 32px 20px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(251, 191, 36, 0.14), rgba(255, 255, 255, 0)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.08));
+    }
+
+    .mobile-toggle-wrap {
+      display: none;
+      padding: 16px 20px 0;
+    }
+
+    .mobile-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(124, 45, 18, 0.08);
+      font-weight: 600;
+    }
+
+    .mobile-toggle small {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .mobile-toggle .chevron {
+      font-size: 18px;
+      color: var(--accent-dark);
+      transition: transform 0.18s ease;
+    }
+
+    .mobile-toggle[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 700px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .sidebar,
+    .main {
+      padding: 28px 32px 32px;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-dark);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: var(--panel-strong);
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(180, 83, 9, 0.45);
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.12);
+    }
+
+    textarea {
+      min-height: 260px;
+      resize: vertical;
+      line-height: 1.7;
+    }
+
+    .voice-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--panel-strong);
+    }
+
+    .voice-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    .voice-card span,
+    .hint,
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #d97706, #9a3412);
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(154, 52, 18, 0.22);
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .status {
+      min-height: 24px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status.ok {
+      color: var(--ok);
+    }
+
+    .status.error {
+      color: var(--bad);
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .meta {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.48);
+      border: 1px solid rgba(31, 41, 55, 0.08);
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 780px) {
+      body {
+        padding: 12px;
+        display: block;
+      }
+
+      .shell {
+        width: 100%;
+      }
+
+      .mobile-toggle-wrap {
+        display: block;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .hero,
+      .sidebar,
+      .main {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      body.mobile-collapsed .hero,
+      body.mobile-collapsed .sidebar {
+        display: none;
+      }
+
+      body.mobile-collapsed .main {
+        padding-top: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="mobile-toggle-wrap">
+      <button id="mobileToggle" class="mobile-toggle" type="button" aria-expanded="false" aria-controls="mobileAux">
+        <span>
+          页面设置
+          <small>手机上默认收起，优先显示朗读内容</small>
+        </span>
+        <span class="chevron">⌄</span>
+      </button>
+    </div>
+
+    <div id="mobileAux">
+    <div class="hero">
+      <h1>MiniMax 本地文本朗读</h1>
+      <p>输入 API Key 和要朗读的文字，点击“开始阅读”后会调用 MiniMax `t2a_v2` 接口，使用固定音色 <code>Chinese (Mandarin)_Reliable_Executive</code> 生成音频并自动播放。</p>
+    </div>
+
+    <div class="grid">
+      <aside class="sidebar">
+        <h2 class="section-title">设置</h2>
+
+        <div class="field">
+          <label for="apiKey">MiniMax API Key</label>
+          <input id="apiKey" type="password" placeholder="输入后会自动保存在本机浏览器">
+          <div class="hint">保存在当前浏览器的 <code>localStorage</code>，不会上传到别处。</div>
+        </div>
+
+        <div class="field">
+          <label for="model">模型</label>
+          <select id="model">
+            <option value="speech-2.8-hd">speech-2.8-hd</option>
+            <option value="speech-2.8-turbo">speech-2.8-turbo</option>
+            <option value="speech-2.6-hd">speech-2.6-hd</option>
+            <option value="speech-2.6-turbo">speech-2.6-turbo</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="speed">语速</label>
+          <input id="speed" type="number" min="0.5" max="2" step="0.1" value="1">
+        </div>
+
+        <div class="field">
+          <label for="volume">音量</label>
+          <input id="volume" type="number" min="0.1" max="10" step="0.1" value="1">
+        </div>
+
+        <div class="voice-card">
+          <strong>固定音色</strong>
+          <span>Chinese (Mandarin)_Reliable_Executive</span>
+        </div>
+
+        <div class="hint" style="margin-top: 16px;">
+          如果浏览器直接打开 <code>file://</code> 页面时请求失败，可以在当前目录执行
+          <code>python3 -m http.server 8000</code>，再访问
+          <code>http://localhost:8000</code>。
+        </div>
+      </aside>
+
+      <main class="main">
+        <h2 class="section-title">朗读内容</h2>
+
+        <div class="field">
+          <label for="text">输入文字</label>
+          <textarea id="text" placeholder="在这里输入要朗读的内容。支持换行。"></textarea>
+        </div>
+
+        <div class="controls">
+          <button id="speakBtn" class="primary">开始阅读</button>
+          <button id="stopBtn" class="secondary" type="button">停止播放</button>
+          <button id="clearBtn" class="secondary" type="button">清空文字</button>
+        </div>
+
+        <div id="status" class="status"></div>
+        <audio id="player" controls preload="none"></audio>
+        <div id="meta" class="meta">等待生成音频。</div>
+      </main>
+    </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "minimax-tts-settings-v1";
+    const VOICE_ID = "Chinese (Mandarin)_Reliable_Executive";
+    const API_URL = "https://api.minimax.io/v1/t2a_v2";
+
+    const apiKeyInput = document.getElementById("apiKey");
+    const modelInput = document.getElementById("model");
+    const speedInput = document.getElementById("speed");
+    const volumeInput = document.getElementById("volume");
+    const textInput = document.getElementById("text");
+    const speakBtn = document.getElementById("speakBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const statusEl = document.getElementById("status");
+    const player = document.getElementById("player");
+    const metaEl = document.getElementById("meta");
+    const mobileToggle = document.getElementById("mobileToggle");
+
+    const mobileQuery = window.matchMedia("(max-width: 780px)");
+
+    let currentAudioUrl = "";
+
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+
+        const settings = JSON.parse(raw);
+        apiKeyInput.value = settings.apiKey || "";
+        modelInput.value = settings.model || "speech-2.8-hd";
+        speedInput.value = String(settings.speed ?? 1);
+        volumeInput.value = String(settings.volume ?? 1);
+        textInput.value = settings.text || "";
+      } catch (error) {
+        console.warn("读取本地设置失败:", error);
+      }
+    }
+
+    function saveSettings() {
+      const settings = {
+        apiKey: apiKeyInput.value.trim(),
+        model: modelInput.value,
+        speed: Number(speedInput.value),
+        volume: Number(volumeInput.value),
+        text: textInput.value
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    }
+
+    function setStatus(message, type = "") {
+      statusEl.textContent = message;
+      statusEl.className = type ? `status ${type}` : "status";
+    }
+
+    function releaseAudioUrl() {
+      if (currentAudioUrl) {
+        URL.revokeObjectURL(currentAudioUrl);
+        currentAudioUrl = "";
+      }
+    }
+
+    function hexToBlobUrl(hex, mimeType) {
+      const cleanHex = hex.trim();
+      if (!cleanHex || cleanHex.length % 2 !== 0) {
+        throw new Error("返回的音频数据不是有效的 hex。");
+      }
+
+      const bytes = new Uint8Array(cleanHex.length / 2);
+      for (let i = 0; i < cleanHex.length; i += 2) {
+        bytes[i / 2] = parseInt(cleanHex.slice(i, i + 2), 16);
+      }
+
+      const blob = new Blob([bytes], { type: mimeType });
+      return URL.createObjectURL(blob);
+    }
+
+    function audioMimeType(format) {
+      if (format === "wav") return "audio/wav";
+      if (format === "flac") return "audio/flac";
+      return "audio/mpeg";
+    }
+
+    function renderMeta(extraInfo, traceId) {
+      const lines = [
+        `voice_id: ${VOICE_ID}`,
+        `model: ${modelInput.value}`,
+        `audio_format: ${extraInfo?.audio_format || "mp3"}`,
+        `audio_length_ms: ${extraInfo?.audio_length ?? "-"}`,
+        `audio_size_bytes: ${extraInfo?.audio_size ?? "-"}`,
+        `sample_rate: ${extraInfo?.audio_sample_rate ?? "-"}`,
+        `bitrate: ${extraInfo?.bitrate ?? "-"}`,
+        `usage_characters: ${extraInfo?.usage_characters ?? "-"}`,
+        `trace_id: ${traceId || "-"}`
+      ];
+      metaEl.textContent = lines.join("\n");
+    }
+
+    function syncMobileLayout() {
+      if (!mobileToggle) return;
+
+      if (!mobileQuery.matches) {
+        document.body.classList.remove("mobile-collapsed");
+        mobileToggle.setAttribute("aria-expanded", "true");
+        return;
+      }
+
+      const expanded = !document.body.classList.contains("mobile-collapsed");
+      mobileToggle.setAttribute("aria-expanded", String(expanded));
+    }
+
+    async function synthesizeSpeech() {
+      const apiKey = apiKeyInput.value.trim();
+      const text = textInput.value.trim();
+      const speed = Number(speedInput.value);
+      const vol = Number(volumeInput.value);
+
+      if (!apiKey) {
+        setStatus("请先填写 API Key。", "error");
+        apiKeyInput.focus();
+        return;
+      }
+
+      if (!text) {
+        setStatus("请输入要朗读的文字。", "error");
+        textInput.focus();
+        return;
+      }
+
+      saveSettings();
+      speakBtn.disabled = true;
+      setStatus("正在请求 MiniMax 生成音频...", "");
+      metaEl.textContent = "生成中，请稍候。";
+
+      try {
+        releaseAudioUrl();
+        player.pause();
+        player.removeAttribute("src");
+        player.load();
+
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: modelInput.value,
+            text,
+            stream: false,
+            language_boost: "Chinese",
+            output_format: "hex",
+            voice_setting: {
+              voice_id: VOICE_ID,
+              speed,
+              vol,
+              pitch: 0
+            },
+            audio_setting: {
+              sample_rate: 32000,
+              bitrate: 128000,
+              format: "mp3",
+              channel: 1
+            }
+          })
+        });
+
+        const result = await response.json().catch(() => null);
+        if (!response.ok) {
+          const message = result?.base_resp?.status_msg || result?.message || `HTTP ${response.status}`;
+          throw new Error(message);
+        }
+
+        if (result?.base_resp?.status_code !== 0) {
+          throw new Error(result?.base_resp?.status_msg || "MiniMax 返回了错误状态。");
+        }
+
+        const audioHex = result?.data?.audio;
+        if (!audioHex) {
+          throw new Error("接口返回成功，但没有拿到音频数据。");
+        }
+
+        const format = result?.extra_info?.audio_format || "mp3";
+        currentAudioUrl = hexToBlobUrl(audioHex, audioMimeType(format));
+        player.src = currentAudioUrl;
+        renderMeta(result.extra_info, result.trace_id);
+
+        await player.play();
+        setStatus("音频生成完成，正在播放。", "ok");
+      } catch (error) {
+        console.error(error);
+        const extra = location.protocol === "file:" ? " 如果你是直接双击打开 HTML，建议改用本地 HTTP 服务访问。" : "";
+        setStatus(`生成失败：${error.message || error}${extra}`, "error");
+        metaEl.textContent = "请求失败。请检查 API Key、网络、浏览器控制台，或确认当前页面是否需要通过本地 HTTP 服务访问。";
+      } finally {
+        speakBtn.disabled = false;
+      }
+    }
+
+    [apiKeyInput, modelInput, speedInput, volumeInput, textInput].forEach((element) => {
+      element.addEventListener("input", saveSettings);
+      element.addEventListener("change", saveSettings);
+    });
+
+    speakBtn.addEventListener("click", synthesizeSpeech);
+
+    stopBtn.addEventListener("click", () => {
+      player.pause();
+      player.currentTime = 0;
+      setStatus("已停止播放。", "");
+    });
+
+    clearBtn.addEventListener("click", () => {
+      textInput.value = "";
+      saveSettings();
+      setStatus("已清空文字。", "");
+      metaEl.textContent = "等待生成音频。";
+    });
+
+    player.addEventListener("ended", () => {
+      setStatus("播放结束。", "ok");
+    });
+
+    if (mobileQuery.matches) {
+      document.body.classList.add("mobile-collapsed");
+    }
+
+    mobileToggle.addEventListener("click", () => {
+      if (!mobileQuery.matches) return;
+      document.body.classList.toggle("mobile-collapsed");
+      syncMobileLayout();
+    });
+
+    if (typeof mobileQuery.addEventListener === "function") {
+      mobileQuery.addEventListener("change", syncMobileLayout);
+    } else if (typeof mobileQuery.addListener === "function") {
+      mobileQuery.addListener(syncMobileLayout);
+    }
+
+    loadSettings();
+    renderMeta(null, null);
+    syncMobileLayout();
+  </script>
+</body>
+</html>
